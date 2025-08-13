@@ -1,0 +1,31 @@
+body {
+  color: red;
+}
+/* 系统头部蒙板 */
+.header-bgCls {
+  pointer-events: none;
+  background: url("/static/images/header/bg.png") center center no-repeat;
+  background-size: 100% 100%;
+}
+
+/* 菜单选中样式 */
+.menu-item-active {
+  background: url("/static/images/header/menu_checked.png") center center no-repeat !important;
+  background-size: 100% 100% !important;
+}
+
+/* 面板背景样式 */
+.panel-bg {
+  background: rgba(196, 24, 24, 0.1);
+  backdrop-filter: blur(5px);
+}
+
+.menu-check-leftCls {
+  background: url("/static/images/header/menu_check_left.png") center center no-repeat;
+  background-size: 100% 100%;
+}
+
+.menu-check-rightCls {
+  background: url("/static/images/header/menu_check_right.png") center center no-repeat;
+  background-size: 100% 100%;
+}

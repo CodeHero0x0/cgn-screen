@@ -1,0 +1,51 @@
+{
+  "scene": {
+    "leftMenu": true,
+    "toolBar": true
+  },
+  "view": {
+    "lng": 120.42893,
+    "lat": 31.48081,
+    "heading": 800,
+    "pitch": 40,
+    "roll": -20
+  },
+  "layers": [
+    {
+      "type": "xyz",
+      "url": "https://t{s}.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=3b8bb3f06ae63a9f545c935271f4ed62",
+      "name": "天地图",
+      "iconUrl": "static/images/basemap/ter.png",
+      "subdomains": [
+        "0", "1", "2", "3", "4", "5", "6", "7"
+      ],
+      "show": true
+    },
+    {
+      "type": "arcgis",
+      "url": "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer",
+      "name": "影像",
+      "iconUrl": "static/images/basemap/img.png",
+      "subdomains": [],
+      "show": false
+    },
+    {
+      "type": "xyz",
+      "url": "https://webst{s}.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}",
+      "name": "高德",
+      "iconUrl": "static/images/basemap/ter.png",
+      "style": "img",
+      "subdomains": ["01", "02", "03", "04"],
+      "crs": "WGS84",
+      "show": false
+    },
+    {
+      "type": "3dtiles",
+      "url": "http://earthsdk.com/v/last/Apps/assets/dayanta/tileset.json",
+      "name": "测试三维tiles",
+      "iconUrl": "static/images/basemap/ter.png",
+      "height": -410,
+      "show": true
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+@font-face {
+  font-family: "TTTGB-Medium";
+  src: url("douyuFont.otf");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Alibaba-PuHuiTi-Bold";
+  src: url("albb-puhuiti-Bold.otf");
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Alibaba-PuHuiTi-Medium";
+  src: url("albb-puhuiti-Medium.otf");
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Alibaba-PuHuiTi-Regular";
+  src: url("albb-puhuiti-Regular.otf");
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: "ShiShangZhongHeiJianTi";
+  src: url("shishanzhonghei.ttf");
+  font-weight: normal;
+  font-style: normal;
+}
