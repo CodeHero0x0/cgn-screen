@@ -2,20 +2,19 @@
     <div class="site-status-container">
       <div 
         v-for="site in sites" 
-        :key="site.id || site.name" 
         class="site-item"
       >
         <div class="site-header">
-          <span class="site-name">{{ site.name }}<i></i></span>
-          <span class="site-percentage">{{ formatPercentage(site.percentage) }}<i>%</i></span>
+          <span class="site-name">{{ site.metric_name }}<i></i></span>
+          <span class="site-percentage">{{ formatPercentage(site.metric_value) }}<i>{{ site.unit }}</i></span>
         </div>
         
         <div class="progress-bar-container">
           <div 
             class="progress-bar" 
             :style="{ 
-              width: site.percentage + '%',
-              background: getProgressColor(site.percentage)
+              width: site.metric_value + '%',
+              background: getProgressColor(site.metric_value)
             }"
           ></div>
         </div>
@@ -37,9 +36,13 @@ export default {
     }
   },
   methods: {
+     stringToNumber(str) {
+		// 自定义转换逻辑
+		return Number(str);
+    },
     // 格式化百分比显示
     formatPercentage(percentage) {
-      return percentage.toFixed(2)
+      return this.stringToNumber(percentage).toFixed()
     },
     
     // 根据百分比获取进度条颜色
@@ -52,7 +55,13 @@ export default {
             return 'linear-gradient(90deg, #66A9CCB2 0%, #7ECCE5E5 70%, #CCEEFF 100%)'
         }
     }
-  }
+  },
+  mounted(){
+
+  },
+  created() {
+    console.log(123,this.sites)
+	},
 }
 </script>
 

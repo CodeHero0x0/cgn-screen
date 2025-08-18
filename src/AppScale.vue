@@ -38,7 +38,7 @@ export default {
     return {
       containerSize: {
       //  width: 2640,
-        width: 8640,
+        width: 3640,
         height: 2160
       },
       scale: {

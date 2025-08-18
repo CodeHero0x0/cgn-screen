@@ -34,6 +34,15 @@ const haininghaitang = [
         },
         component: () => import("../../views/main/homeIndex/ResourceEndowment"),
       },
+      {
+        // 模块4
+        path: "/equipmentManagement",
+        name: "equipmentManagement",
+        meta: {
+          keepAlive: false,
+        },
+        component: () => import("../../views/main/homeIndex/equipmentManagement"),
+      },
     ],
   },
   // {

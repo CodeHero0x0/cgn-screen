@@ -4,21 +4,7 @@
 	  <div class="legend-and-controls">
 		<!-- 左侧自定义图例 -->
 		<div class="custom-legend">
-			<div class="legend-item">
-				<span class="legend-text" style="color:#FFFFFF99;">(万kWh)</span>
-			</div>
-			<div class="legend-item custom-legend-div2">
-				<div class="legend-icon legend-icon-predicted"></div>
-				<span class="legend-text" style="color:#FFFFFFCC;">预测发电量</span>
-			</div>
-			<div class="legend-item">
-				<div class="legend-icon legend-icon-resource"  :class="{legendiconresource1: echartsData.IconCurve == '平均辐照度'}"></div>
-                <div class="legend-icon "></div>
-				<span class="legend-text" style="color:#FFFFFFCC;">{{echartsData.IconCurve}}</span>
-			</div>
-            <div class="legend-item legend-right">
-				<span class="" style="color:#FFFFFF99;">{{ echartsData.unitOfMeasurement }}</span>
-			</div>
+			
 		</div>
 	  </div>
 	  <!-- 图表容器 -->
@@ -61,7 +47,7 @@ export default {
   computed: {
     xAxisData() {
       // 模拟图片中的X轴标签
-      return ['7.26', '7.27', '7.28', '7.29', '7.30', '7.31', '8.01']
+      return ['模拟图片中', '模拟图片中', '模拟图片中', '模拟图片中', '模拟图片中', '模拟图片中', '模拟图片中']
     }
   },
   created(){
@@ -154,10 +140,10 @@ export default {
         animationDuration: 3500,
         animationEasing: 'cubicOut',
         grid: {
-            left: '0',
+            left: '50',
             right: '20',
             top: '20',
-            bottom: '20',
+            bottom: '40',
             containLabel: true
         },
         tooltip: {
@@ -210,12 +196,14 @@ export default {
             },
             axisLabel: {
                 color: '#7ec7ff',
-                fontSize: 26
+                fontSize: 26,
+                margin: 20 // 调整这个值（单位为像素）以增加标签与柱状图之间的距离
             },
             splitLine: {
                 show: false
             }
         },
+
         yAxis: [
             {
                 type: 'value',
@@ -240,28 +228,7 @@ export default {
                     }
                 }
             },
-            {
-                type: 'value',
-                name: '',
-                position: 'right',
-                min: 0,
-                max: rightYAxisMax, // 动态设置最大值
-                interval: rightYAxisInterval, // 动态设置间隔
-                axisLine: {
-                    show: false
-                },
-                axisTick: {
-                    show: false
-                },
-                axisLabel: {
-                    color: '#7ec7ff',
-                    fontSize: 26,
-                    formatter: '{value}'
-                },
-                splitLine: {
-                    show: false
-                }
-            }
+           
         ],
         series: [
             {
@@ -301,30 +268,7 @@ export default {
                     }
                 }
             },
-            {
-                name: '平均风速',
-                type: 'line',
-                yAxisIndex: 1,
-                data: data.resource,
-                symbol: 'circle',
-                symbolSize: 8,
-                lineStyle: {
-                    color: '#ffcc00',
-                    width: 2
-                },
-                itemStyle: {
-                    color: '#ffcc00',
-                    borderColor: '#ffcc00',
-                    borderWidth: 2
-                },
-                label: {
-                    show: true,
-                    position: 'top',
-                    color: '#ffcc00',
-                    fontSize: 26,
-                    formatter: '{c}'
-                }
-            },
+           
         ]
 
 
@@ -416,8 +360,8 @@ export default {
   }
   
   .chart-container {
-    width: 1374px;
-    height:446px;
+    width: 100%;
+    height:100%;
     border-radius: 4px;
   }
 }

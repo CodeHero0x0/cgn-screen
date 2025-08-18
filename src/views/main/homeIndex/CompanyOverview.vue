@@ -7,109 +7,48 @@
 					<Time></Time>
 				</div>
 			</div>
-			<div class="conLeft">
+			<!-- <div class="conLeft">
 				<div class="PowerGeneration">
 					<div class="generatingCapacity"></div>
 					<div class="container">
 						<div class="grid">
 						<div class="grid-item ">
-							<h2 class="grid-item-h21"><span>(万KW)</span></h2>
+							<h2 class="grid-item-h21 container-h21"><span>(万KW)</span></h2>
 							<div class="zjgm">
-								<p>
-									<span>装机规模</span>
-									<span>{{ deviceInfo.installedScale }}</span>
-								</p>
-								<p>
-									<span>批复量</span>
-									<span>{{ deviceInfo.approvedAmount }}</span>
-								</p>
-								<p>
-									<span>并网量</span>
-									<span>{{ deviceInfo.gridAmount }}</span>
-								</p>
-								<p>
-									<span>并购量</span>
-									<span>{{ deviceInfo.purchaseAmount }}</span>
-								</p>
-								<p>
-									<span>储备量</span>
-									<span>{{ deviceInfo.reserveAmount }}</span>
-								</p>
-								<p>
-									<span>在建量</span>
-									<span>{{ deviceInfo.underConstructionAmount }}</span>
+								<p v-for="value in installedCapacityData">
+									<span>{{ value.metric_name }}</span>
+									<span>{{ value.metric_value }}</span>
 								</p>
 							</div>
 						</div>
 						<p class="Divider"></p>
 						<div class="grid-item">
-							<h2 class="grid-item-h21"><span>(万KW)</span></h2>
+							<h2 class="grid-item-h21 container-h22"><span>(万KW)</span></h2>
 							<div class="zjgm">
-								<p class="first">
-									<span>风电</span>
-									<span>{{ businessDistribution.wind }}</span>
-								</p>
-								<p class="first">
-									<span>光伏</span>
-									<span>{{ businessDistribution.solar }}</span>
-								</p>
-								<p class="first">
-									<span>储能</span>
-									<span>{{ businessDistribution.distributed }}</span>
-								</p>
-								<p class="first">
-									<span>源网荷储</span>
-									<span>{{ businessDistribution.energy }}</span>
+								<p class="first" v-for="value in commercialDistributionData">
+									<span>{{ value.metric_name }}</span>
+									<span>{{ value.metric_value }}</span>
 								</p>
 							</div>
 						</div>
 						<p class="Divider"></p>
 						<div class="grid-item">
-							<h2 class="grid-item-h21"><span>(座)</span></h2>
+							<h2 class="grid-item-h21 container-h23"><span>(座)</span></h2>
 							<div class="zjgm">
-								<p  class="second">
-									<span>并网总数</span>
-									<span>{{ stationCount.total }}</span>
-								</p>
-								<p  class="second">
-									<span>风电</span>
-									<span>{{ stationCount.wind }}</span>
-								</p>
-								<p  class="second">
-									<span>光伏</span>
-									<span>{{ stationCount.solar }}</span>
-								</p>
-								<p  class="first">
-									<span>储能</span>
-									<span>{{ stationCount.storage }}</span>
-								</p>
-								<p class="first">
-									<span>源网荷储</span>
-									<span>{{ stationCount.energy }}</span>
+								<p v-if="value.metric_name !='分布式'" :class="{ 'first': value.metric_name == '储能电站数量' || value.metric_name == '源网荷储','second': value.metric_name != '储能电站数量' && value.metric_name != '源网荷储' }" v-for="value in powerStationNumData">
+									<span>{{ value.metric_name }}</span>
+									<span>{{ value.metric_value }}</span>
 								</p>
 							</div>
 						</div>
 						<p class="Divider"></p>
 						<div class="grid-item">
-							<h2 class="grid-item-h21"><span>(台)</span></h2>
+							<h2 class="grid-item-h21 container-h24"><span>(台)</span></h2>
 							<div class="zjgm">
-								<p class="first">
-									<span>设备总数</span>
-									<span>{{ equipmentStats.total }}</span>
+								<p class="first" v-for="value in fetchPowerGenerationData">
+									<span>{{ value.metric_name }}</span>
+									<span>{{ value.metric_value }}</span>
 								</p>
-								<p class="first">
-									<span>风机台数</span>
-									<span>{{ equipmentStats.wind }}</span>
-								</p>
-								<p class="first">
-									<span>光伏逆变器</span>
-									<span>{{ equipmentStats.solar }}</span>
-								</p>
-								<p class="first">
-									<span>储能逆变器</span>
-									<span>{{ equipmentStats.storage }}</span>
-								</p>
-								
 							</div>
 						</div>
 						</div>
@@ -123,15 +62,15 @@
 								<div class="grid-item">
 									<h2 class="grid-item-h21"></h2>
 									<div class="grid-item-div1">
-										<p class="overhaul">大修:<span> 26</span><i> 台</i></p>
-										<p class="stopped">长停:<span> 3</span><i> 台</i></p>
+										<p :class="{ 'overhaul': value.metric_name == '大修','stopped': value.metric_name == '长停'}" v-for="value in runningStatusNumData">
+											{{value.metric_name}}:<span> {{value.metric_value}}</span><i> {{value.unit}}</i>
+										</p>
 									</div>
 									<div class="grid-item-div2">
 										<div class="grid-item-div2-div1">
 											<p>
 												<span class="fengji"></span>
 												<span>风机</span>
-												
 											</p>
 											<p>
 												<span>正常: <i style="color: #00F2FF;"> 1325</i></span>
@@ -183,17 +122,10 @@
 									</div>
 									
 									<div class="Equipment-warning">
-										<p>
-											<span style="color:#AFAFAF;">预警总数</span>
-											<span style="color:#fff;">36<i style="color:#67717D;"> 条</i></span>
-										</p>
-										<p>
-											<span style="color:#AFAFAF;">已审核条款</span>
-											<span style="color:#fff;">36<i style="color:#67717D;"> 条</i></span>
-										</p>
-										<p>
-											<span style="color:#AFAFAF;">亚健康设备</span>
-											<span style="color:#fff;">0<i style="color:#67717D;"> 台</i></span>
+										
+										<p v-for="value in healthStatusNumData">
+											<span style="color:#AFAFAF;">{{ value.metric_name }}</span>
+											<span style="color:#fff;">{{ value.metric_value }}<i style="color:#67717D;"> {{ value.unit }}</i></span>
 										</p>
 									</div>
 								</div>
@@ -205,103 +137,76 @@
 					<div class="Equipment-utilization-rate">
 						<h2></h2>
 						<div class="average">
-							<p>
-								<span>风电等效利用小时数</span>
-								<span>1015<i> &nbsp;h</i></span>
-							</p>
-							<p>
-								<span>风电高于行业平均</span>
-								<span>90<i> &nbsp;h</i></span>
-							</p>
-							<p>
-								<span>光伏等效利用小时数</span>
-								<span>440<i> &nbsp;h</i></span>
-							</p>
-							<p>
-								<span>光伏等效利用小时数</span>
-								<span>-71<i> &nbsp;h</i></span>
+							<p v-for="value in rateOfEquipmentData">
+								<span>{{ value.metric_name }}</span>
+								<span>{{ value.metric_value }}<i> &nbsp;{{ value.unit }}</i></span>
 							</p>
 						</div>
 						<div class="ranking">
 							<div class="ranking-fd">
 								<h2></h2>
-								<SiteStatus :sites="siteData"></SiteStatus>
+								<SiteStatus :sites="lightTop5Data"></SiteStatus>
 							</div>
 							<div class="ranking-gf">
 								<h2></h2>
-								<SiteStatus :sites="siteData"></SiteStatus>
+								<SiteStatus :sites="windTop5Data"></SiteStatus>
 							</div>
 						</div>
 					</div>
 					<div class="situation">
 						<h2></h2>
 						<div class="average">
-							<p>
-								<span>无人机</span>
-								<span>4<i> / 4<i style="font-size: 26px;"> 架</i></i></span>
-							</p>
-							<p>
-								<span>飞手</span>
-								<span>18<i> / 18<i style="font-size: 26px;"> 名</i></i></span>
-							</p>
-							<p>
-								<span>摄像头</span>
-								<span>1094<i> / 1094<i style="font-size: 26px;"> 架</i></i></span>
-							</p>
-							<p>
-								<span>机器人</span>
-								<span>0<i> / 0<i style="font-size: 26px;"> 个</i></i></span>
-							</p>
-							<p>
-								<span>机巢</span>
-								<span>0<i> / 0<i style="font-size: 26px;"> 个</i></i></span>
+							<p v-for="value in equipmentData">
+								<span>{{ value.metric_name }}</span>
+								<span>{{ value.metric_value }}<i> / {{ value.metric_value }}<i style="font-size: 26px;"> {{ value.unit }}</i></i></span>
 							</p>
 						</div>
 						<h2></h2>
 						<div class="Intelligent-inspection">
 							<div class="Intelligent-inspection-left">
 								<div class="xunjian">
-									<p>累计巡检数量</p>
-									<p>39449<i> 次</i></p>
+									<p>{{ smartInspectionData[0].metric_name }}</p>
+									<p>{{ smartInspectionData[0].metric_value }}<i> {{ smartInspectionData[0].unit }}</i></p>
 								</div>
 								<div class="xj-Divider"></div>
 								<div class="gaojing">
-									<p>累计告警数量</p>
-									<p>1332<i> 条</i></p>
+									<p>{{ smartInspectionData[1].metric_name }}</p>
+									<p>{{ smartInspectionData[1].metric_value }}<i> {{ smartInspectionData[1].unit }}</i></p>
 								</div>
 							</div>
+							
 							<div class="Intelligent-inspection-right">
 								<div class="Inspection-details">
 									<p>
-										<span class="xj-guangfu">光伏累计巡检</span>
-										<span>10753<i> GW</i></span>
+										<span class="xj-guangfu">{{ smartInspectionData[2].metric_name }}</span>
+										<span>{{ smartInspectionData[2].metric_value }}<i> {{ smartInspectionData[2].unit }}</i></span>
 									</p>
 									<p>
-										<span class="xj-fengdian">风电累计巡检</span>
-										<span>28696<i> MW</i></span>
+										<span class="xj-fengdian">{{ smartInspectionData[3].metric_name }}</span>
+										<span>{{ smartInspectionData[3].metric_value }}<i> {{ smartInspectionData[3].unit }}</i></span>
 									</p>
 									<p>
-										<span class="xj-jidian">集电线路累计巡检</span>
-										<span>458<i> KW</i></span>
+										<span class="xj-jidian">{{ smartInspectionData[4].metric_name }}</span>
+										<span>{{ smartInspectionData[4].metric_value }}<i> {{ smartInspectionData[4].unit }}</i></span>
 									</p>
 									<p>
-										<span class="lj-guangfu">累计巡检组件</span>
-										<span>10753<i> 万块</i></span>
+										<span class="lj-guangfu">{{ smartInspectionData[5].metric_name }}</span>
+										<span>{{ smartInspectionData[5].metric_value }}<i> {{ smartInspectionData[5].unit }}</i></span>
 									</p>
 									<p>
-										<span class="lj-fengdian">累计巡检台数</span>
-										<span>10753<i> 台</i></span>
+										<span class="lj-fengdian">{{ smartInspectionData[6].metric_name }}</span>
+										<span>{{ smartInspectionData[6].metric_value }}<i> {{ smartInspectionData[6].unit }}</i></span>
 									</p>
 									<p>
-										<span class="lj-jidian">累计巡检杆塔</span>
-										<span>28696<i> 座</i></span>
+										<span class="lj-jidian">{{ smartInspectionData[7].metric_name }}</span>
+										<span>{{ smartInspectionData[7].metric_value }}<i> {{ smartInspectionData[7].unit }}</i></span>
 									</p>
 								</div>
 							</div>
 						</div>
 					</div>
 				</div>
-			</div>
+			</div> -->
 			<div class="conmiddle">
 				<div class="conmiddle-div">
 					<button>公司总览</button>
@@ -310,6 +215,7 @@
 					<button>设备管控</button>
 				</div>
 			</div>
+
 			<div class="conRight">
 				<div class="PowerGeneration">
 					<div class="generatingCapacity"></div>
@@ -353,24 +259,9 @@
 							</div>
 						</div>
 						<div class="ElectricityStatistics">
-							<div class="ElectricityStatistics_div">
-								<div>
-									<p>年损失电量:<i>196.42</i></p>
-								</div>
-							</div>
-							<div class="ElectricityStatistics_div">
-								<div>
-									<p>单位容量损失电量:<i>0.30</i></p>
-								</div>
-							</div>
-							<div class="ElectricityStatistics_div">
-								<div>
-									<p>年限电量:<i>286086</i></p>
-								</div>
-							</div>
-							<div class="ElectricityStatistics_div">
-								<div>
-									<p>年限电率:<i>0.04%</i></p>
+							<div class="ElectricityStatistics_div" v-for="value in getByTypeData">
+								<div >
+									<p>{{ value.metric_name }}:<i>{{ value.metric_value }}</i></p>
 								</div>
 							</div>
 						</div>
@@ -395,16 +286,16 @@
 								<div class="staff-div">
 									<p class="staff-div-p1">
 										<span class="staff-span1"><span>内部人员</span></span>
-										<span class="staff-span2">专工<i></i><span>25</span></span>
-										<span class="staff-span3">技术<i></i><span>5</span></span>
-										<span class="staff-span4">运维<i></i><span>276</span></span>
+										<span class="staff-span2">{{ personData[0].metric_name }}<i></i><span>{{ personData[0].metric_value }}</span></span>
+										<span class="staff-span3">{{ personData[1].metric_name }}<i></i><span>{{ personData[1].metric_value }}</span></span>
+										<span class="staff-span4">{{ personData[2].metric_name }}<i></i><span>{{ personData[2].metric_value }}</span></span>
 									</p>
 									<p  class="staff-div-Divider"></p>
 									<p class="staff-div-p2">
 										<span class="staff-span1"><span>内部人员</span></span>
-										<span class="staff-span2">总数<i></i><span>2081</span></span>
-										<span class="staff-span3">入场数<i></i><span>2081</span></span>
-										<span class="staff-span4">在场数<i></i><span>719</span></span>
+										<span class="staff-span2">{{ personData[3].metric_name }}<i></i><span>{{ personData[3].metric_value }}</span></span>
+										<span class="staff-span3">{{ personData[4].metric_name }}<i></i><span>{{ personData[4].metric_value }}</span></span>
+										<span class="staff-span4">{{ personData[5].metric_name }}<i></i><span>{{ personData[5].metric_value }}</span></span>
 									</p>
 								</div>
 							</div>
@@ -414,9 +305,9 @@
 								<div class="staff-div">
 									<p class="staff-div-p1">
 										<span class="staff-span1"><span>在运车辆</span></span>
-										<span class="staff-span2">运营车辆总数<i></i><span>0</span></span>
-										<span class="staff-span3">工作车辆<i></i><span>87</span></span>
-										<span class="staff-span4">外来车辆<i></i><span>0</span></span>
+										<span class="staff-span2">{{ carData[0].metric_name }}<i></i><span>{{ carData[0].metric_value }}</span></span>
+										<span class="staff-span3">{{ carData[1].metric_name }}<i></i><span>{{ carData[1].metric_value }}</span></span>
+										<span class="staff-span4">{{ carData[2].metric_name }}<i></i><span>{{ carData[2].metric_value }}</span></span>
 									</p>
 								</div>
 							</div>
@@ -433,41 +324,10 @@
 					<div class="secure-yunwei-right">
 						<h2></h2>
 						<div class="average">
-							<p>
-								<span>场站总数</span>
-								<span>40<i style="font-size: 26px;"> 座</i></span>
-							</p>
-							<p>
-								<span>项目总数</span>
-								<span>52<i style="font-size: 26px;"> 个</i></span>
-							</p>
-							<p>
-								<span>投运项目数</span>
-								<span>52<i style="font-size: 26px;"> 个</i></span>
-							</p>
-							<p>
-								<span>主设备</span>
-								<span>48<i style="font-size: 26px;"> 台</i></span>
-							</p>
-							<p>
-								<span>任务</span>
-								<span>2628<i style="font-size: 26px;"> 个</i></span>
-							</p>
-							<p>
-								<span>工单</span>
-								<span>34649<i style="font-size: 26px;"> 个</i></span>
-							</p>
-							<p>
-								<span>工作票</span>
-								<span>14725<i style="font-size: 26px;"> 个</i></span>
-							</p>
-							<p>
-								<span>操作票</span>
-								<span>94<i style="font-size: 26px;"> 个</i></span>
-							</p>
-							<p>
-								<span>工时</span>
-								<span>0<i style="font-size: 26px;"> 小时</i></span>
+							
+							<p v-for="value in wisdomOpsData">
+								<span>{{ value.metric_name }}</span>
+								<span>{{ value.metric_value }}<i style="font-size: 26px;"> {{ value.unit }}</i></span>
 							</p>
 						</div>
 					</div>
@@ -491,8 +351,6 @@ import SiteStatus from "@COM/StyleComponent/SiteStatus.vue";
 import earlyWarning from "@COM/StyleComponent/earlyWarning.vue";
 import WeatherWarning from "@COM/StyleComponent/WeatherWarning.vue";
 import RiskChart from "@COM/echarts/RiskChart.vue";
-
-
 export default {
   	name: "homeIndex",
   	components: {
@@ -529,48 +387,6 @@ export default {
 				{'name':'光伏','year':'60050','month':'71610','daily':'39.62%',"YoY":'-11.24%','MoM':'14%'},
 				{'name':'储能','year':'22108','month':'36008','daily':'61.40%',"YoY":'','MoM':''},
 				{'name':'源网荷储','year':'63639','month':'67690','daily':'94.02%',"YoY":'','MoM':''},
-			],
-			deviceInfo: {
-				installedScale: 653.85,
-				approvedAmount: 536,
-				gridAmount: 653.85,
-				purchaseAmount: 110,
-				reserveAmount: 536,
-				underConstructionAmount: 175,
-			},
-			businessDistribution: {
-				wind: 430666,
-				solar: 60051,
-				distributed: 20275,
-				energy: 63639,
-			},
-			stationCount: {
-				total: 36,
-				wind: 27,
-				solar: 9,
-				storage: 12,
-				distributed: 5,
-				energy:1,
-			},
-			equipmentStats: {
-				total: 5261,
-				wind: 1235,
-				solar: 4026,
-				storage: 738,
-			},
-			siteData: [
-				{ id: 1, name: '哈密分散式', percentage: 99.99 },
-				{ id: 2, name: '玛依塔斯', percentage: 90.01 },
-				{ id: 3, name: '博景上湖', percentage: 86.78 },
-				{ id: 4, name: '吉木乃分散式二期', percentage: 85.08 },
-				{ id: 5, name: '三塘湖二期', percentage: 82.32 }
-			],
-			siteData1: [
-				{ id: 1, name: '石城子', percentage: 99.99 },
-				{ id: 2, name: '雅满苏', percentage: 90.01 },
-				{ id: 3, name: '青河', percentage: 86.78 },
-				{ id: 4, name: '图木舒克', percentage: 85.08 },
-				{ id: 5, name: '尉犁', percentage: 82.32 }
 			],
 			events: [
 				{
@@ -653,12 +469,61 @@ export default {
 				1: { text: '问题某一明', color: '#ff4757' },
 				2: { text: '问题某一明', color: '#ffa726' },
 				3: { text: '问题某一明', color: '#2ed573' },
-			}
+			},
+			//公司总览/资产全景/
+			fetchPowerGenerationData:[],
+			powerStationNumData:[],
+			commercialDistributionData:[],
+			installedCapacityData:[],
+			//公司总览/设备统计
+			runningStatusNumData:[],
+			healthStatusNumData:[],
+			healthStatusData:[],
+			runningStatusByTypeData:[],
+			//设备利用率
+			lightTop5Data:[],
+			windTop5Data:[],
+			rateOfEquipmentData:[],
+			//设备巡检
+			smartInspectionData:[],
+			equipmentData:[],
+			//发电量
+			statisticsData:[],
+			getByTypeData:[],
+			//人员车辆
+			carData:[],
+			personData:[],
+			//智慧运维
+			wisdomOpsData:[],
 		}
 	},
 	created() {
 	},
   	mounted() {
+		this.fetchPowerGeneration();
+		this.powerStationNum();
+		this.commercialDistribution();
+		this.installedCapacity();
+		//设备统计
+		this.runningStatusNum();
+		this.healthStatusNum();
+		this.healthStatus();
+		this.runningStatusByType();
+		//设备利用率
+		this.lightTop5();
+		this.windTop5();
+		this.rateOfEquipment();
+		//设备巡检
+		this.smartInspection();
+		this.equipment();
+		//发电量
+		this.statistics();
+		this.getByType();
+		//人员车辆
+		this.car();
+		this.person();
+		//智慧运维
+		this.wisdomOps();
 	},
 	beforeDestroy(){
 	},
@@ -675,6 +540,193 @@ export default {
 		"SET_FJ_TYPE",
 		"SET_REGIONBGFLAG"
 		]),
+		fetchPowerGeneration() {
+			this.$http.sx.powerGeneration({
+			}).then(res => {
+					if (res.code === 0) {
+						this.fetchPowerGenerationData = res.data.rowData;
+					}
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		powerStationNum() {
+			this.$http.sx.powerStationNum({
+			}).then(res => {
+					if (res.code === 0) {
+						this.powerStationNumData = res.data.rowData;
+					}
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		commercialDistribution() {
+			this.$http.sx.commercialDistribution({
+			}).then(res => {
+					if (res.code === 0) {
+						this.commercialDistributionData = res.data.rowData;
+					}
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		installedCapacity() {
+			this.$http.sx.installedCapacity({
+			}).then(res => {
+					if (res.code === 0) {
+						this.installedCapacityData = res.data.rowData;
+					}
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		//设备状态
+		runningStatusNum() {
+			this.$http.sx.runningStatusNum({
+			}).then(res => {
+				if (res.code === 0) {
+					this.runningStatusNumData = res.data.rowData;
+				}
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		healthStatusNum() {
+			this.$http.sx.healthStatusNum({
+
+			}).then(res => {
+				if (res.code === 0) {
+					this.healthStatusNumData = res.data.rowData;
+					console.log(10,this.healthStatusNumData)
+				}
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		healthStatus() {
+			let type  = '健康';
+			this.$http.sx.healthStatus({
+				type 
+			}).then(res => {
+				if (res.code === 0) {
+					this.healthStatusData = res.data.rowData;
+				}
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		runningStatusByType() {
+			this.$http.sx.runningStatusByType({
+			}).then(res => {
+				if (res.code === 0) {
+					this.runningStatusByTypeData = res.data.rowData;
+				}
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		//设备可利用率
+		lightTop5() {
+			this.$http.sx.lightTop5({
+			}).then(res => {
+				if (res.code === 0) {
+					this.lightTop5Data = res.data.rowData;
+				}
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		windTop5() {
+			this.$http.sx.windTop5({
+			}).then(res => {
+				if (res.code === 0) {
+					this.windTop5Data = res.data.rowData;
+				}
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		rateOfEquipment() {
+			this.$http.sx.rateOfEquipment({
+			}).then(res => {
+				if (res.code === 0) {
+					this.rateOfEquipmentData = res.data.rowData;
+				}
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		smartInspection() {
+			this.$http.sx.smartInspection({
+			}).then(res => {
+				if (res.code === 0) {
+					this.smartInspectionData = res.data.rowData;
+				}
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		equipment() {
+			this.$http.sx.equipment({
+			}).then(res => {
+				if (res.code === 0) {
+					this.equipmentData = res.data.rowData;
+				}
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		statistics() {
+			this.$http.sx.statistics({
+			}).then(res => {
+				if (res.code === 0) {
+					this.statisticsData = res.data.rowData;
+				}
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getByType() {
+			this.$http.sx.getByType({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getByTypeData = res.data.rowData;
+				}
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		car() {
+			this.$http.sx.car({
+			}).then(res => {
+				if (res.code === 0) {
+					this.carData = res.data.rowData;
+				}
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		person() {
+			this.$http.sx.person({
+			}).then(res => {
+				if (res.code === 0) {
+					this.personData = res.data.rowData;
+				}
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		wisdomOps() {
+			this.$http.sx.wisdomOps({
+			}).then(res => {
+				if (res.code === 0) {
+					this.wisdomOpsData = res.data.rowData;
+				}
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		
 	},
 }
 </script>
@@ -750,8 +802,17 @@ export default {
 			.grid-item {
 				border-radius: 10px;
 				box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
-				.grid-item-h21{
+				.container-h21{
 					background: url("../../../assets/images/CompanyOverview/zhuangjirongliang.png") 0% center no-repeat;
+				}
+				.container-h22{
+					background: url("../../../assets/images/CompanyOverview/zc-ytfb.png") 0% center no-repeat;
+				}
+				.container-h23{
+					background: url("../../../assets/images/CompanyOverview/zc-dzsl.png") 0% center no-repeat;
+				}
+				.container-h24{
+					background: url("../../../assets/images/CompanyOverview/zc-sbtj.png") 0% center no-repeat;
 				}
 			}
 			

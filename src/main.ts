@@ -37,7 +37,6 @@ import "/static/css/light.css";
 
 import http from './service/interface'
 import scroll from 'vue-seamless-scroll'
-
 Vue.use(scroll)
 Vue.use(ElementUI, { size: 'small', zIndex: 3000 })
 Vue.use(VueCompositionApi)
