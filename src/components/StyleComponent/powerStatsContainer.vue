@@ -239,7 +239,7 @@ export default {
 .header-img{
 	width: 100%;
 	height: 100px;
-	background: url("../../assets/images/homepage/Component 238.png") center center no-repeat;
+	background: url("../../assets/images/homepage/xiandianfenxi.png") center center no-repeat;
 }
 .header-tabs {
   display: flex;

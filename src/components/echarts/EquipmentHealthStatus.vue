@@ -40,36 +40,12 @@ export default {
       totalGenerator: 0,
       totalLoss: 0,
       
-      // 图表数据 - 使用更平均的堆叠数据
+      // 图表数据
       chartData: {
         all: {
 			month: {
-				generator: [],      // 发电机组
-				loss: []           // 性能损失
-			},
-			year: {
-				generator: [],
-				loss: []
-			}
-        },
-        wind: {
-			month: {
-				generator: [],
-				loss: []
-			},
-			year: {
-				generator: [],
-				loss: []
-			}
-        },
-        solar: {
-			month: {
-				generator: [],
-				loss: []
-			},
-			year: {
-				generator: [],
-				loss: []
+				generator: [],      // 健康数据
+				loss: []           // 亚健康数据
 			}
         }
       }
@@ -78,20 +54,32 @@ export default {
   
   computed: {
     xAxisData() {
-      const timeLabels = {
-        month: ['场站', '场站', '场站', '场站', '场站', '场站', '场站', '场站', '场站', '场站', '场站', '场站'],
-        year: ['2019年', '2020年', '2021年', '2022年', '2023年']
-      }
-      return timeLabels[this.timeType]
+      // 使用父组件传来的场站名称作为x轴数据
+      return this.StackedBarChartData?.metric_name || []
+    }
+  },
+  
+  watch: {
+    // 监听父组件数据变化
+    StackedBarChartData: {
+      handler(newData) {
+        if (newData && newData.health && newData.subhealth) {
+          this.initializeData()
+          this.$nextTick(() => {
+            this.updateChart()
+            this.updateData()
+          })
+        }
+      },
+      deep: true,
+      immediate: true
     }
   },
   
   mounted() {
-	this.initializeData()
-	this.$nextTick(() => {
-		this.initChart()
-		this.updateData()
-	})
+    this.$nextTick(() => {
+      this.initChart()
+    })
   },
   
   beforeDestroy() {
@@ -101,128 +89,19 @@ export default {
   },
   
   methods: {
-    // 生成平衡的堆叠数据 - 两个部分比例相对平均
-    generateBalancedStackData(count, totalMin, totalMax) {
-      const data = {
-        generator: [],
-        loss: []
-      }
-      
-      for (let i = 0; i < count; i++) {
-        // 生成总值（带有平滑的趋势变化）
-        const progress = i / (count - 1) // 0到1的进度
-        const baseTrend = totalMin + (totalMax - totalMin) * (0.3 + 0.4 * progress) // 基础趋势
-        const variation = (totalMax - totalMin) * 0.15 * (Math.random() - 0.5) // ±15%随机变化
-        const totalValue = Math.round(baseTrend + variation)
-        
-        // 分配比例 - 让两个部分相对平均
-        // 发电机组占 75-85%，性能损失占 15-25%
-        const generatorRatio = 0.75 + Math.random() * 0.10 // 75%-85%
-        const lossRatio = 1 - generatorRatio // 剩余部分
-        
-        data.generator.push(Math.round(totalValue * generatorRatio))
-        data.loss.push(Math.round(totalValue * lossRatio))
-      }
-      
-      return data
-    },
-    
-    // 平衡数据生成方法（用于单独数据）
-    generateBalancedData(count, min, max, decimals = 0) {
-      const data = []
-      const range = max - min
-      const step = range / (count - 1)
-      
-      for (let i = 0; i < count; i++) {
-        // 基础值按线性分布
-        const baseValue = min + (step * i)
-        // 添加小幅随机波动（±10%）
-        const variation = baseValue * 0.1 * (Math.random() - 0.5) * 2
-        const value = baseValue + variation
-        
-        // 确保值在范围内
-        const clampedValue = Math.max(min, Math.min(max, value))
-        data.push(decimals > 0 ? parseFloat(clampedValue.toFixed(decimals)) : Math.round(clampedValue))
-      }
-      
-      return data
-    },
-    
-    // 保留原有的随机数据生成方法
-    generateRandomData(count, min, max, decimals = 0) {
-      const data = []
-      for (let i = 0; i < count; i++) {
-        const value = Math.random() * (max - min) + min
-        data.push(decimals > 0 ? parseFloat(value.toFixed(decimals)) : Math.round(value))
-      }
-      return data
-    },
-    
     // 初始化数据
     initializeData() {
-      // 生成风电数据 - 月度总量 1000-1500万kWh
-      const windMonthData = this.generateBalancedStackData(12, 1000, 1500)
-      this.chartData.wind.month.generator = windMonthData.generator
-      this.chartData.wind.month.loss = windMonthData.loss
+      if (!this.StackedBarChartData || !this.StackedBarChartData.health) {
+        return
+      }
       
-      // 生成风电数据 - 年度总量 12000-18000万kWh
-      const windYearData = this.generateBalancedStackData(5, 12000, 18000)
-      this.chartData.wind.year.generator = windYearData.generator
-      this.chartData.wind.year.loss = windYearData.loss
-      
-      // 生成光伏数据 - 月度总量 500-800万kWh
-      const solarMonthData = this.generateBalancedStackData(12, 500, 800)
-      this.chartData.solar.month.generator = solarMonthData.generator
-      this.chartData.solar.month.loss = solarMonthData.loss
-      
-      // 生成光伏数据 - 年度总量 6000-10000万kWh
-      const solarYearData = this.generateBalancedStackData(5, 6000, 10000)
-      this.chartData.solar.year.generator = solarYearData.generator
-      this.chartData.solar.year.loss = solarYearData.loss
-      
-      // 计算全部数据
-      this.calculateAllData()
-    },
-    
-    // 计算风电和光伏的总和数据
-    calculateAllData() {
-      // 计算月度数据
-      this.chartData.all.month.generator = this.chartData.wind.month.generator.map((val, index) => 
-        val + this.chartData.solar.month.generator[index]
+      // 将字符串数组转换为数字数组
+      this.chartData.all.month.generator = this.StackedBarChartData.health.map(item => 
+        parseInt(item) || 0
       )
-      this.chartData.all.month.loss = this.chartData.wind.month.loss.map((val, index) => 
-        val + this.chartData.solar.month.loss[index]
+      this.chartData.all.month.loss = this.StackedBarChartData.subhealth.map(item => 
+        parseInt(item) || 0
       )
-      
-      // 计算年度数据
-      this.chartData.all.year.generator = this.chartData.wind.year.generator.map((val, index) => 
-        val + this.chartData.solar.year.generator[index]
-      )
-      this.chartData.all.year.loss = this.chartData.wind.year.loss.map((val, index) => 
-        val + this.chartData.solar.year.loss[index]
-      )
-    },
-    
-    // 重新生成更平衡的随机数据
-    refreshData() {
-      // 重新初始化所有数据
-      this.initializeData()
-      
-      // 更新图表
-      this.updateChart()
-      this.updateData()
-    },
-    
-    switchTab(tab) {
-      this.activeTab = tab
-      this.updateChart()
-      this.updateData()
-    },
-    
-    switchTimeType(type) {
-      this.timeType = type
-      this.updateChart()
-      this.updateData()
     },
     
     updateData() {
@@ -239,14 +118,19 @@ export default {
       
       try {
         this.chart = this.$echarts.init(this.$refs.chart)
-        this.updateChart()
+        // 如果数据已经准备好，立即更新图表
+        if (this.StackedBarChartData && this.StackedBarChartData.health) {
+          this.initializeData()
+          this.updateChart()
+          this.updateData()
+        }
       } catch (error) {
         console.error('图表初始化失败:', error)
       }
     },
     
     updateChart() {
-        if (!this.chart) return
+        if (!this.chart || !this.chartData.all.month.generator.length) return
         
         const data = this.chartData[this.activeTab][this.timeType]
         
@@ -284,7 +168,7 @@ export default {
                     let result = `<div style="padding: 8px 0; border-bottom: 1px solid #333; margin-bottom: 8px; font-size: 14px; color: #00ccff;">${barParams[0].axisValue}</div>`
                     
                     barParams.forEach(param => {
-                        const unit = '万kWh'
+                        const unit = this.StackedBarChartData?.quantity || '台'
                         result += `
                             <div style="margin: 8px 0; display: flex; justify-content: space-between; align-items: center;">
                                 <span style="display: flex; align-items: center;">
@@ -359,18 +243,18 @@ export default {
                 }
             },
             series: [
-                // 柱状图系列 - 只保留两个部分
+                // 柱状图系列 - 亚健康数据
                 {
-                    name: '性能损失',
+                    name: this.StackedBarChartData?.IconCurve || '亚健康≤90°H',
                     type: 'bar',
                     stack: 'total',
                     data: data.loss,
                     barWidth: '30%',
                     itemStyle: {
                         color: new this.$echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                            { offset: 0, color: 'rgba(0, 192, 255, 0.6)' },   // 顶部 60% 透明度
-                            { offset: 0.5, color: 'rgba(0, 192, 255, 0.4)' }, // 中间 40% 透明度
-                            { offset: 1, color: 'rgba(0, 192, 255, 0.2)' }    // 底部 20% 透明度
+                            { offset: 0, color: 'rgba(255, 92, 92, 0.6)' },   // 红色渐变表示亚健康
+                            { offset: 0.5, color: 'rgba(255, 92, 92, 0.4)' },
+                            { offset: 1, color: 'rgba(255, 92, 92, 0.2)' }
                         ]),
                         borderColor: 'transparent',
                         borderWidth: 0,
@@ -379,23 +263,24 @@ export default {
                     emphasis: {
                         itemStyle: {
                             color: new this.$echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                                { offset: 0, color: 'rgba(0, 192, 255, 0.8)' },
-                                { offset: 0.5, color: 'rgba(0, 192, 255, 0.6)' },
-                                { offset: 1, color: 'rgba(0, 192, 255, 0.4)' }
+                                { offset: 0, color: 'rgba(255, 92, 92, 0.8)' },
+                                { offset: 0.5, color: 'rgba(255, 92, 92, 0.6)' },
+                                { offset: 1, color: 'rgba(255, 92, 92, 0.4)' }
                             ])
                         }
                     }
                 },
+                // 柱状图系列 - 健康数据
                 {
-                    name: '发电机组',
+                    name: this.StackedBarChartData?.solar || '健康90~100°H',
                     type: 'bar',
                     stack: 'total',
                     data: data.generator,
                     itemStyle: {
                         color: new this.$echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                            { offset: 0, color: 'rgba(0, 192, 255, 0.6)' },   // 顶部 60% 透明度
-                            { offset: 0.5, color: 'rgba(0, 192, 255, 0.4)' }, // 中间 40% 透明度
-                            { offset: 1, color: 'rgba(0, 192, 255, 0.2)' }    // 底部 20% 透明度
+                            { offset: 0, color: 'rgba(0, 192, 255, 0.6)' },   // 蓝色渐变表示健康
+                            { offset: 0.5, color: 'rgba(0, 192, 255, 0.4)' },
+                            { offset: 1, color: 'rgba(0, 192, 255, 0.2)' }
                         ]),
                         borderColor: 'transparent',
                         borderWidth: 0,
@@ -411,9 +296,9 @@ export default {
                         }
                     }
                 },
-                // 横线系列 - 性能损失顶部
+                // 横线系列 - 亚健康顶部分割线
                 {
-                    name: '性能损失分割线',
+                    name: '亚健康分割线',
                     type: 'line',
                     data: data.loss.map(value => value),
                     symbol: 'rect',
@@ -436,9 +321,9 @@ export default {
                         show: false
                     }
                 },
-                // 横线系列 - 发电机组顶部
+                // 横线系列 - 健康顶部分割线
                 {
-                    name: '发电机组分割线',
+                    name: '健康分割线',
                     type: 'line',
                     data: data.loss.map((value, index) => value + data.generator[index]),
                     symbol: 'rect',
@@ -476,15 +361,6 @@ export default {
   border-radius: 4px;
   padding: 0px;
   color: #7ec7ff;
-  .legend-and-controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-	width: 100%;
-	height: 48px;
-	margin-top: 20px;
-  }
   
   .custom-legend {
     display: flex;
@@ -546,6 +422,5 @@ export default {
 .bottom{
     width: 1128px;
     height: 10px;
-	//background: url("../../../assets/images/homepage/Rectangle 330.png") center center no-repeat;
 }
 </style>

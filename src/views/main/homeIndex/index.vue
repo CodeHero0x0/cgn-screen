@@ -12,38 +12,38 @@
 					<div class="generatingCapacity"></div>
 					<div class="PowerGenerationBody">
 						<div class="generatingCapacityData">
-							<div class="total"  v-for="item in statsContentDate">
+							<div class="total"  v-for="item in getPowerGenerationData">
 								<div class="totalData">
-									<h2>{{item.name}}</h2>
+									<h2>{{item.mid_category}}</h2>
 									<p class="underline"></p>
 									<div class="stats-content">
 										<div class="stats-item">
 											<div class="stats-row">
 											<span class="label">本年发电量</span>
 											<span class="arrow"></span>
-											<span class="value">5295.14</span>
+											<span class="value">{{ item.sub_category }}</span>
 											</div>
 											<div class="growth-rate positive">
-											+5295.14% 
-											<span class="growth-arrow"></span>
+												<span v-if="item.metric_value ">+{{ item.metric_value }}</span>
+												<span class="growth-arrow" v-if="item.metric_value "></span>
 											</div>
 										</div>
 										<div class="stats-item">
 											<div class="stats-row">
 											<span class="label">本月发电量</span>
 											<span class="arrow"></span>
-											<span class="value">880.57</span>
+											<span class="value">{{ item.metric_name }}</span>
 											</div>
-											<div class="growth-rate positive">
-											+5295.14% 
-											<span class="growth-arrow"></span>
+											<div class="growth-rate positive" >
+												<span v-if="item.four_category">+{{ item.four_category }}</span>
+												<span class="growth-arrow" v-if="item.four_category"></span>
 											</div>
 										</div>
 										<div class="stats-item">
 											<div class="stats-row">
 											<span class="label">昨日发电量</span>
 											<span class="arrow"></span>
-											<span class="value">1.33</span>
+											<span class="value">{{ item.unit }}</span>
 											</div>
 										</div>
 									</div>
@@ -51,12 +51,11 @@
 							</div>
 						</div>
 						<div class="ElectricityStatistics">
-							<div class="ElectricityStatistics_div">
+							<div class="ElectricityStatistics_div" v-for="value in getPlannedPowerData">
 								<div>
-									<p>年计划发电量:91000</p>
+									<p>{{value.metric_name}}:{{ value.metric_value }}</p>
 									<p>本月计划发电量:5206.36</p>
-								</div>
-								<div>
+								</div>						<div>
 									<p style="color:#999;">超发 <span>-49.42</span><i></i></p>
 									<p style="color:#999;">超发 <span>-49.42</span><i></i></p>
 								</div>
@@ -93,7 +92,7 @@
 							</div>
 							<div class="ElectricityStatistics_div">
 								<div>
-									<p>年综合场用电率:2.21%</p>
+									<p>年综合场用电率:2.21%</p>	
 								</div>
 								<div>
 								</div>
@@ -106,12 +105,12 @@
 					<div class="StationStatisticsBody">
 						<div class="MonthlyStatistics">
 							<div class="MonthlyStatisticstitle"></div>
-							<CompleteStatistics1 ></CompleteStatistics1>
+							<CompleteStatistics :echartsData="getAnnualCompletionData"></CompleteStatistics>
 							<div class="bottom"></div>
 						</div>
 						<div class="annualStatistics">
 							<div class="MonthlyStatisticstitle"></div>
-							<CompleteStatistics></CompleteStatistics>
+							<CompleteStatistics :echartsData="getMonthlyCompletionData"></CompleteStatistics>
 							<div class="bottom"></div>
 						</div>
 					</div>
@@ -147,7 +146,7 @@
 					<button>设备管控</button>
 				</div>
 			</div>
-			<div class="conRight">
+			<!-- <div class="conRight">
 				<div class="ResourcesSituation">
 					<div class="resources">
 						<LossPowerChart></LossPowerChart>
@@ -177,7 +176,7 @@
 						<div class="bottom"></div>
 					</div>
 				</div>
-			</div>
+			</div> -->
         </div>
     </div>
 </template>
@@ -228,20 +227,33 @@ export default {
 			StackedBarChartData1:{'name': '场外受累','all':'月度','wind':'年累计','solar':'电网','IconCurve':'天气原因','unitOfMeasurement':'其他'},
 			StackedBarChartData2:{'name': '计划停运','all':'月度','wind':'年累计','solar':'发电机组','IconCurve':'输变电','unitOfMeasurement':'其他'},
 			StackedBarChartData3:{'name': '限电损失','all':'月度','wind':'年累计','solar':'发电机组','IconCurve':'输变电','unitOfMeasurement':'其他'},
-			
-			statsContentDate:[
-				{'name':'合计','year':'5295.14','month':'880.57','daily':'1.33',},
-				{'name':'风电','year':'5295.14','month':'880.57','daily':'1.33',},
-				{'name':'光伏','year':'5295.14','month':'880.57','daily':'1.33',},
-				{'name':'分布式','year':'5295.14','month':'880.57','daily':'1.33',},
-				{'name':'储能','year':'5295.14','month':'880.57','daily':'1.33',},
-				{'name':'源网荷储','year':'5295.14','month':'880.57','daily':'1.33',},
-			],
+			getPowerGenerationData:[],
+			getPlannedPowerData:[],
+			//业务运营/各场站上网电量完成情况
+			getAnnualCompletionData:[],
+			getMonthlyCompletionData:[],
+			//业务运营/发电量和资源
+			getWindMonthlyActualData:[],
+			getWindMonthlyForecastedData:[],
+			//业务运营/损失电量
+			getAffectedOnSiteData:[],
+			//业务运营/限电分析
+			getAnnualRationingData:[],
+			getMonthlyRationingData:[],
 		}
 	},
 	created() {
 	},
   	mounted() {
+		this.getPowerGeneration();
+		this.getPlannedPower();
+		this.getAnnualCompletion();
+		this.getMonthlyCompletion();
+		this.getWindMonthlyActual();
+		this.getWindMonthlyForecasted();
+		this.getAffectedOnSite();
+		this.getAnnualRationing();
+		this.getMonthlyRationing();
 	},
 	beforeDestroy(){
 	},
@@ -258,6 +270,98 @@ export default {
 		"SET_FJ_TYPE",
 		"SET_REGIONBGFLAG"
 		]),
+		getPowerGeneration() {
+			this.$http.sx.getPowerGeneration({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getPowerGenerationData = res.data.rowData;
+				}
+				
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getPlannedPower() {
+			this.$http.sx.getPlannedPower({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getPlannedPowerData = res.data.rowData;
+				}
+				
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getAnnualCompletion() {
+			this.$http.sx.getAnnualCompletion({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getAnnualCompletionData = res.data.rowData;
+				}
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getMonthlyCompletion() {
+			this.$http.sx.getMonthlyCompletion({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getMonthlyCompletionData = res.data.rowData;
+				}
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getWindMonthlyActual() {
+			this.$http.sx.getWindMonthlyActual({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getWindMonthlyActualData = res.data.rowData;
+				}
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getWindMonthlyForecasted() {
+			this.$http.sx.getWindMonthlyForecasted({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getWindMonthlyForecastedData = res.data.rowData;
+				}
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getAffectedOnSite() {
+			this.$http.sx.getAffectedOnSite({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getAffectedOnSiteData = res.data.rowData;
+				}
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getAnnualRationing() {
+			this.$http.sx.getAnnualRationing({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getAnnualRationingData = res.data.rowData;
+				}
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getMonthlyRationing() {
+			this.$http.sx.getMonthlyRationing({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getMonthlyRationingData = res.data.rowData;
+				}
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
 	},
 }
 </script>
@@ -320,9 +424,10 @@ export default {
 				gap: 30px;
 				justify-content: space-between;
 				.total,.windPower,.PhotovoltaicPower,.distributed,.storedEnergy,.SourceNetworkLoadStorage{
-					width: 438px;
+					width: 532px;
 					height: 428px;
 					background: url("../../../assets/images/homepage/di.png") center center no-repeat;
+					background-size: 100% 100%;
 					overflow: hidden;
 				}
 				.totalData{
@@ -417,6 +522,7 @@ export default {
 				}
 				.totalData:hover{
 					background: url("../../../assets/images/homepage/di1.png") 100% 100% no-repeat;
+					background-size: 100% 100%;
 				}
 			}
 			.ElectricityStatistics{

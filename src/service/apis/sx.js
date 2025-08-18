@@ -42,8 +42,39 @@ export default {
    //公司总览/人员车辆/人员信息
    person: (params) => http.getAxios('/api/companyOverview/personAndCar/person', params),
 
+   //公司总览/安全概览/安全概览统计
+   safetyoverview: (params) => http.getAxios('/api/companyOverview/safetyoverview', params),
+   
   //公司总览/智慧运维/智慧运维统计
   wisdomOps: (params) => http.getAxios('/api/companyOverview/wisdomOps', params),
+ 
+  //业务运营/发电量
+  getPowerGeneration: (params) => http.getAxios('/api/getPowerGeneration', params),
+  //业务运营/发电量
+  getPowerGeneration: (params) => http.getAxios('/api/getPowerGeneration', params),
+
+  //业务运营/各场站上网电量完成情况/年度完成情况
+  getAnnualCompletion: (params) => http.getAxios('/api/business/getAnnualCompletion', params),
+  //业务运营/各场站上网电量完成情况/月度完成情况
+  getPlannedPower: (params) => http.getAxios('/api/business/getPlannedPower', params),
+
+  //业务运营/发电量和资源/风电-年度
+  getWindMonthlyActual: (params) => http.getAxios('/api/business/getWindMonthlyActual', params),
+  //业务运营/发电量和资源/风电-月度
+  getWindMonthlyForecasted: (params) => http.getAxios('/api/business/getWindMonthlyForecasted', params),
+
+  getMonthlyCompletion: (params) => http.getAxios('/api/business/getMonthlyCompletion', params),
+  // getMonthlyCompletion: (params) => http.getAxios('/api/business/getMonthlyCompletion', params),
+  // getMonthlyCompletion: (params) => http.getAxios('/api/business/getMonthlyCompletion', params),
+
+  //业务运营/损失电量/年累计限电概览
+  getAffectedOnSite: (params) => http.getAxios('/api/business/getAffectedOnSite', params),
+
+  //业务运营/限电分析/年累计限电概览
+  getAnnualRationing: (params) => http.getAxios('/api/business/getAnnualRationing', params),
+  //业务运营/限电分析/月累计限电概览
+  getMonthlyRationing: (params) => http.getAxios('/api/business/getMonthlyRationing', params),
+
 }
 
 

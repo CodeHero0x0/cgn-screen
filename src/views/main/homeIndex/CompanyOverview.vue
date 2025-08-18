@@ -7,7 +7,7 @@
 					<Time></Time>
 				</div>
 			</div>
-			<!-- <div class="conLeft">
+			<div class="conLeft">
 				<div class="PowerGeneration">
 					<div class="generatingCapacity"></div>
 					<div class="container">
@@ -67,48 +67,15 @@
 										</p>
 									</div>
 									<div class="grid-item-div2">
-										<div class="grid-item-div2-div1">
-											<p>
+										<div class="grid-item-div2-div1" v-for="value in runningStatusByTypeData">
+											<p >
 												<span class="fengji"></span>
-												<span>风机</span>
+												<span>{{ value.sub_category }}</span>
 											</p>
 											<p>
-												<span>正常: <i style="color: #00F2FF;"> 1325</i></span>
-												<span>异常: <i style="color: #FF230B;"> 7</i></span>
-												<span>维护: <i style="color: #FF990B;"> 0	</i></span>
-											</p>
-										</div>
-										<div class="grid-item-div2-div2">
-											<p>
-												<span class="jidianxianlu"></span>
-												<span>集电线路</span>
-											</p>
-											<p>
-												<span>正常: <i style="color: #00F2FF;"> 354</i></span>
-												<span>异常: <i style="color: #FF230B;"> 0</i></span>
-												<span>维护: <i style="color: #FF990B;"> 0</i></span>
-											</p>
-										</div>
-										<div class="grid-item-div2-div3">
-											<p>
-												<span class="nibianqi"></span>
-												<span>逆变器</span>
-											</p>
-											<p>
-												<span>正常: <i style="color: #00F2FF;"> 4026</i></span>
-												<span>异常: <i style="color: #FF230B;"> 0</i></span>
-												<span>维护: <i style="color: #FF990B;"> 0</i></span>
-											</p>
-										</div>
-										<div class="grid-item-div2-div4">
-											<p>
-												<span class="chunengPCS"></span>
-												<span>储能PCS</span>
-											</p>
-											<p>
-												<span>正常: <i style="color: #00F2FF;"> 0</i></span>
-												<span>异常: <i style="color: #FF230B;"> 4026</i></span>
-												<span>维护: <i style="color: #FF990B;"> 0</i></span>
+												<span>正常: <i style="color: #00F2FF;"> {{ value.normal }}</i></span>
+												<span>异常: <i style="color: #FF230B;"> {{ value.abnormal }}</i></span>
+												<span>维护: <i style="color: #FF990B;"> {{ value.maintain }}</i></span>
 											</p>
 										</div>
 									</div>
@@ -117,7 +84,7 @@
 								<div class="grid-item jkzt">
 									<div>
 										<h2 class="grid-item-h22"></h2>
-										<EquipmentHealthStatus :StackedBarChartData="StackedBarChartData2"></EquipmentHealthStatus>
+										<EquipmentHealthStatus :StackedBarChartData="healthStatusData"></EquipmentHealthStatus>
 										<div class="bottom" style="width: 1128px;"></div>
 									</div>
 									
@@ -163,7 +130,7 @@
 						</div>
 						<h2></h2>
 						<div class="Intelligent-inspection">
-							<div class="Intelligent-inspection-left">
+							<div class="Intelligent-inspection-left" v-if="smartInspectionData.length > 1">
 								<div class="xunjian">
 									<p>{{ smartInspectionData[0].metric_name }}</p>
 									<p>{{ smartInspectionData[0].metric_value }}<i> {{ smartInspectionData[0].unit }}</i></p>
@@ -175,7 +142,7 @@
 								</div>
 							</div>
 							
-							<div class="Intelligent-inspection-right">
+							<div class="Intelligent-inspection-right" v-if="smartInspectionData.length > 1">
 								<div class="Inspection-details">
 									<p>
 										<span class="xj-guangfu">{{ smartInspectionData[2].metric_name }}</span>
@@ -206,7 +173,7 @@
 						</div>
 					</div>
 				</div>
-			</div> -->
+			</div>
 			<div class="conmiddle">
 				<div class="conmiddle-div">
 					<button>公司总览</button>
@@ -221,9 +188,9 @@
 					<div class="generatingCapacity"></div>
 					<div class="PowerGenerationBody">
 						<div class="generatingCapacityData">
-							<div class="total"  v-for="item in statsContentDate">
+							<div class="total"  v-for="item in statisticsData">
 								<div class="totalData">
-									<h2>{{item.name}}</h2>
+									<h2>{{item.mid_category}}</h2>
 									<p class="underline"></p>
 									<div class="stats-content">
 										<div class="stats-item">
@@ -241,7 +208,7 @@
 											<div class="stats-row">
 											<span class="label">计划电量</span>
 											<span class="arrow"></span>
-											<span class="value">{{ item.month }}</span>
+											<span class="value">{{ item.plan }}</span>
 											</div>
 											<div class="growth-rate positive">
 											
@@ -251,7 +218,7 @@
 											<div class="stats-row">
 											<span class="label">计划完成率</span>
 											<span class="arrow"></span>
-											<span class="value">{{ item.daily }}</span>
+											<span class="value">{{ item.finishingRate }}</span>
 											</div>
 										</div>
 									</div>
@@ -283,8 +250,8 @@
 							<div class="staff">
 								<p class="staff-p1">人员</p>
 								<p class="staff-p2"></p>
-								<div class="staff-div">
-									<p class="staff-div-p1">
+								<div class="staff-div" v-if="personData.length > 1">
+									<p class="staff-div-p1" >
 										<span class="staff-span1"><span>内部人员</span></span>
 										<span class="staff-span2">{{ personData[0].metric_name }}<i></i><span>{{ personData[0].metric_value }}</span></span>
 										<span class="staff-span3">{{ personData[1].metric_name }}<i></i><span>{{ personData[1].metric_value }}</span></span>
@@ -302,7 +269,7 @@
 							<div class="vehicle">
 								<p class="staff-p1">车辆</p>
 								<p class="staff-p2"></p>
-								<div class="staff-div">
+								<div class="staff-div" v-if="personData.length > 1">
 									<p class="staff-div-p1">
 										<span class="staff-span1"><span>在运车辆</span></span>
 										<span class="staff-span2">{{ carData[0].metric_name }}<i></i><span>{{ carData[0].metric_value }}</span></span>
@@ -318,7 +285,7 @@
 					<div class="secure-yunwei-left">
 						<h2></h2>
 						<div class="weatherwarning">
-							<RiskChart ></RiskChart>
+							<RiskChart :safetyoverviewData="safetyoverviewData"></RiskChart>
 						</div>
 					</div>
 					<div class="secure-yunwei-right">
@@ -379,7 +346,7 @@ export default {
 			echartsData1:{'name': '计划发电情况','all':'全部','wind':'风电','solar':'光伏','IconCurve':'完成率','unitOfMeasurement':'%'},
 			StackedBarChartData:{'name': '场内受累','all':'月度','wind':'年累计','solar':'发电机组','IconCurve':'输变电(升压站、集电线路)','unitOfMeasurement':'性能损失'},
 			StackedBarChartData1:{'name': '场外受累','all':'月度','wind':'年累计','solar':'电网','IconCurve':'天气原因','unitOfMeasurement':'其他'},
-			StackedBarChartData2:{'name': '计划停运','all':'月度','wind':'年累计','solar':'健康90~100°H','IconCurve':'亚健康≤90°H','unitOfMeasurement':'其他','quantity':'(台)'},
+		
 			StackedBarChartData3:{'name': '限电损失','all':'月度','wind':'年累计','solar':'发电机组','IconCurve':'输变电','unitOfMeasurement':'其他'},
 			statsContentDate:[
 				{'name':'合计','year':'490717','month':'666528','daily':'46.12%',"YoY":'20.43%','MoM':'21.79%'},
@@ -478,7 +445,7 @@ export default {
 			//公司总览/设备统计
 			runningStatusNumData:[],
 			healthStatusNumData:[],
-			healthStatusData:[],
+			healthStatusData:{'name': '计划停运','all':'月度','wind':'年累计','solar':'健康90~100°H','IconCurve':'亚健康≤90°H','unitOfMeasurement':'其他','quantity':'(台)',metric_name:[],health:[],subhealth:[],},
 			runningStatusByTypeData:[],
 			//设备利用率
 			lightTop5Data:[],
@@ -493,6 +460,8 @@ export default {
 			//人员车辆
 			carData:[],
 			personData:[],
+			//公司总览/安全概览
+			safetyoverviewData:[],
 			//智慧运维
 			wisdomOpsData:[],
 		}
@@ -522,6 +491,8 @@ export default {
 		//人员车辆
 		this.car();
 		this.person();
+		//公司总览/安全概览
+		this.safetyoverview();
 		//智慧运维
 		this.wisdomOps();
 	},
@@ -597,19 +568,23 @@ export default {
 			}).then(res => {
 				if (res.code === 0) {
 					this.healthStatusNumData = res.data.rowData;
-					console.log(10,this.healthStatusNumData)
 				}
 			}).catch((error)=>{
 				console.log(error)
 			})
 		},
 		healthStatus() {
-			let type  = '健康';
 			this.$http.sx.healthStatus({
-				type 
 			}).then(res => {
 				if (res.code === 0) {
-					this.healthStatusData = res.data.rowData;
+					//this.healthStatusData = res.data.rowData;
+					//	healthStatusData:{'name': '计划停运','all':'月度','wind':'年累计','solar':'健康90~100°H','IconCurve':'亚健康≤90°H','unitOfMeasurement':'其他','quantity':'(台)',metric_name:[场站],health:[健康],subhealth:[亚健康],},
+
+					res.data.rowData.map((i)=>{
+						this.healthStatusData.metric_name.push(i.metric_name)
+						this.healthStatusData.subhealth.push(i.subHealth)
+						this.healthStatusData.health.push(i.health)
+					})
 				}
 			}).catch((error)=>{
 				console.log(error)
@@ -711,6 +686,16 @@ export default {
 			}).then(res => {
 				if (res.code === 0) {
 					this.personData = res.data.rowData;
+				}
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		safetyoverview() {
+			this.$http.sx.safetyoverview({
+			}).then(res => {
+				if (res.code === 0) {
+					this.safetyoverviewData = res.data.rowData;
 				}
 			}).catch((error)=>{
 				console.log(error)
