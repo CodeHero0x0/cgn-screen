@@ -44,7 +44,7 @@
                         </div>
                         <div class="Alarm-prompt">
 							<h2></h2>
-							<monitorEarlyWarning class="earlyWarning" :events="events" :columns="eventColumns" :priority-config="customPriorityConfig"></monitorEarlyWarning>
+							<monitorEarlyWarning class="earlyWarning":echartsData="getAlarmPromptData" :predictionData="eventColumns"></monitorEarlyWarning>
 						</div>
                         <div class="statistical-analysis">
                             <div class="statistical">
@@ -59,7 +59,7 @@
 							</div>
                             <div class="analysis">
 								<h2></h2>
-								<EarlywarningAnalysis class="EarlywarningAnalysis" :echartsData="echartsData" :predictionData="chartData"></EarlywarningAnalysis>
+								<EarlywarningAnalysis class="EarlywarningAnalysis" :echartsData="getAlarmPromptData" :predictionData="chartData"></EarlywarningAnalysis>
 							</div>
                         </div>
                     </div>
@@ -104,7 +104,7 @@
                        </div>
                        <div class="early-warning">
 							<h2></h2>
-							<monitorEarlyWarning class="earlyWarning" :events="events" :columns="eventColumns" :priority-config="customPriorityConfig"></monitorEarlyWarning>
+							<monitorEarlyWarning class="earlyWarning":echartsData="getWarningDetailsData" :predictionData="eventColumns1"></monitorEarlyWarning>
 					   </div>
 					</div>
 				</div>
@@ -157,7 +157,7 @@
 					</div>
 					<div class="Alarm-Statistics">
 						<h2></h2>
-						<monitorEarlyWarning class="earlyWarning" :events="events" :columns="eventColumns" :priority-config="customPriorityConfig"></monitorEarlyWarning>
+						<monitorEarlyWarning class="earlyWarning" :events="events" :columns="eventColumns" ></monitorEarlyWarning>
 					</div>
 					<div class="UAV">
 						<h2></h2>
@@ -233,7 +233,7 @@
 						
 					</div>
 					<div class="Station-warning">
-						<monitorEarlyWarning class="earlyWarning" :events="events" :columns="eventColumns" :priority-config="customPriorityConfig"></monitorEarlyWarning>
+						<monitorEarlyWarning class="earlyWarning" :events="events" :columns="eventColumns" ></monitorEarlyWarning>
 					</div>
 				</div>
 				<div class="IOM">
@@ -303,7 +303,7 @@
 						<div class="bottom"></div>
 					</div>
 					<div class="Work-OrderList">
-						<monitorEarlyWarning class="earlyWarning" :events="events" :columns="eventColumns" :priority-config="customPriorityConfig"></monitorEarlyWarning>
+						<monitorEarlyWarning class="earlyWarning" :events="events" :columns="eventColumns" ></monitorEarlyWarning>
 					</div>
 					<div class="Work-order-content">
 						<div class="Work-order-content-left">
@@ -441,163 +441,21 @@ export default {
 			{ id: 1, name: '预警总数', quantity: 42 },
 			{ id: 1, name: '预警总数', quantity: 42 },
 			],
-			events: [
-				{
-				id: 1,
-				priority: 1,
-				content: '问题某一',
-				content1: '问题某一',
-				content2: '问题某一',
-				content3: '问题某一',
-				location: '问题某一明',
-				time: '2018-03-14 10:27:00',
-				operator: '张三'
-				},
-				{
-				id: 1,
-				priority: 1,
-				content: '问题某一',
-				content1: '问题某一',
-				content2: '问题某一',
-				content3: '问题某一',
-				location: '问题某一明',
-				time: '2018-03-14 10:27:00',
-				operator: '张三'
-				},
-				{
-				id: 1,
-				priority: 1,
-				content: '问题某一',
-				content1: '问题某一',
-				content2: '问题某一',
-				content3: '问题某一',
-				location: '问题某一明',
-				time: '2018-03-14 10:27:00',
-				operator: '张三'
-				},
-				{
-				id: 1,
-				priority: 1,
-				content: '问题某一',
-				content1: '问题某一',
-				content2: '问题某一',
-				content3: '问题某一',
-				location: '问题某一明',
-				time: '2018-03-14 10:27:00',
-				operator: '张三'
-				},
-				{
-				id: 1,
-				priority: 1,
-				content: '问题某一',
-				content1: '问题某一',
-				content2: '问题某一',
-				content3: '问题某一',
-				location: '问题某一明',
-				time: '2018-03-14 10:27:00',
-				operator: '张三'
-				},
-				{
-				id: 1,
-				priority: 1,
-				content: '问题某一',
-				content1: '问题某一',
-				content2: '问题某一',
-				content3: '问题某一',
-				location: '问题某一明',
-				time: '2018-03-14 10:27:00',
-				operator: '张三'
-				},
-				{
-				id: 1,
-				priority: 1,
-				content: '问题某一',
-				content1: '问题某一',
-				content2: '问题某一',
-				content3: '问题某一',
-				location: '问题某一明',
-				time: '2018-03-14 10:27:00',
-				operator: '张三'
-				},
-				{
-				id: 1,
-				priority: 1,
-				content: '问题某一',
-				content1: '问题某一',
-				content2: '问题某一',
-				content3: '问题某一',
-				location: '问题某一明',
-				time: '2018-03-14 10:27:00',
-				operator: '张三'
-				},
-				{
-				id: 1,
-				priority: 1,
-				content: '问题某一',
-				content1: '问题某一',
-				content2: '问题某一',
-				content3: '问题某一',
-				location: '问题某一明',
-				time: '2018-03-14 10:27:00',
-				operator: '张三'
-				},
-				{
-				id: 1,
-				priority: 1,
-				content: '问题某一',
-				content1: '问题某一',
-				content2: '问题某一',
-				content3: '问题某一',
-				location: '问题某一明',
-				time: '2018-03-14 10:27:00',
-				operator: '张三'
-				},
-				// ... 更多数据
-			],
 			// 列配置
 			eventColumns: [
-				{ 
-				key: 'priority', 
-				title: '场站', 
-				flex: '0 0 15%', 
-				type: 'priority' 
-				},
-				{ 
-				key: 'content', 
-				title: '是否超期', 
-				flex: '15%' 
-				},
-				{ 
-				key: 'content1', 
-				title: '设备型号', 
-				flex: '20%' 
-				},
-				{ 
-				key: 'content2', 
-				title: '机型编号', 
-				flex: '15%' 
-				},
-				{ 
-				key: 'content3', 
-				title: '风机名称', 
-				flex: '15%' 
-				},
-				{ 
-				key: 'time', 
-				title: '预警时间', 
-				flex: '0 0 30%',
-				formatter: (value) => {
-					// 自定义时间格式化
-					return new Date(value).toLocaleString();
-				}
-				}
+				{key: 'priority', title: '场站', flex: '0 0 15%', type: 'priority' },
+				{ key: 'content', title: '间隔名称', flex: '15%' },
+				{ key: 'content1', title: '故障信息', flex: '20%' },
+				{ key: 'time', title: '时间', flex: '0 0 30%',}
 			],
-			// 自定义优先级配置
-			customPriorityConfig: {
-				1: { text: '问题某一明', color: '#ff4757' },
-				2: { text: '问题某一明', color: '#ffa726' },
-				3: { text: '问题某一明', color: '#2ed573' },
-			},
+			eventColumns1: [
+				{ key: 'priority', title: '场站', flex: '0 0 15%', type: 'priority' },
+				{ key: 'content', title: '是否超期', flex: '15%' },
+				{ key: 'content1', title: '设备型号', flex: '20%' },
+				{ key: 'content2', title: '机型编号', flex: '15%' },
+				{ key: 'content3', title: '风机名称', flex: '15%' },
+				{ key: 'time', title: '预警时间', flex: '0 0 30%',}
+			],
 			//设备管控/智慧监控
 			getWarningDetailsData:[],
 			getMonitoringData:[],
@@ -1105,7 +963,7 @@ export default {
                     margin-top: 30px;
 					h2{
 						height: 52px;
-						background: url("../../../assets/images/equipmentManagement/shishichuli.png") 0% center no-repeat;
+						background: url("../../../assets/images/equipmentManagement/gaojingtishi.png") 0% center no-repeat;
 					}
 					.earlyWarning{
 						width: 100%;
