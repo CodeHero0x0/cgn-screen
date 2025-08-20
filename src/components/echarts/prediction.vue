@@ -12,8 +12,7 @@
 				<span class="legend-text" style="color:#FFFFFFCC;">预测发电量</span>
 			</div>
 			<div class="legend-item">
-				<div class="legend-icon legend-icon-resource"  :class="{legendiconresource1: echartsData.IconCurve == '平均辐照度'}"></div>
-                <div class="legend-icon "></div>
+				<div class="legend-icon legend-icon-resource" :class="{legendiconresource1: echartsData.IconCurve == '平均辐照度'}"></div>
 				<span class="legend-text" style="color:#FFFFFFCC;">{{echartsData.IconCurve}}</span>
 			</div>
             <div class="legend-item legend-right">
@@ -29,124 +28,98 @@
 <script>
 export default {
   name: 'PowerGenerationChart',
-  props:[
-	'echartsData',
-  	'predictionData'
+  props: [
+	'echartsData'
   ],
   data() {
     return {
-      activeTab: 'all',
-      timeType: 'month',
       chart: null,
       totalPredicted: 0,
-      totalActual: 0,
-      completionRate: 0,
-      avgResource: 0,
-      chartData: {
-        all: {
-			month: {
-				predicted: [644.557, 879.606, 874.198, 956.398, 770.51, 949.894, 1107.971], // 柱状图数据
-				actual: [],
-				resource: [] // 这里会根据predicted数据计算
-			},
-			year: {
-				predicted: [],
-				actual: [],
-				resource: []
-			}
-        }
-      }
+      avgResource: 0
     }
   },
+  
   computed: {
     xAxisData() {
-      // 模拟图片中的X轴标签
-      return ['7.26', '7.27', '7.28', '7.29', '7.30', '7.31', '8.01']
+      // 从 echartsData 中提取 metric_name 作为X轴标签
+      if (!this.echartsData || !Array.isArray(this.echartsData)) {
+        return [];
+      }
+      return this.echartsData.map(item => item.metric_name || '');
+    },
+
+    // 处理后的图表数据
+    processedChartData() {
+      if (!this.echartsData || !Array.isArray(this.echartsData)) {
+        return {
+          predicted: [],
+          resource: []
+        };
+      }
+
+      return {
+        predicted: this.echartsData.map(item => parseFloat(item.metric_value) || 0),
+        resource: this.echartsData.map(item => parseFloat(item.unit) || 0)
+      };
     }
   },
-  created(){
-	this.chartData.all.month.predicted = this.predictionData;
-	console.log(11111111111,this.chartData.all.month.predicted)
-  },
+  
   mounted() {
-	this.initializeData()
 	this.$nextTick(() => {
-		this.initChart()
-		this.updateData()
-	})
+		this.initChart();
+		this.updateData();
+	});
+  },
+
+  watch: {
+    // 监听数据变化，重新渲染图表
+    echartsData: {
+      handler() {
+        this.updateChart();
+        this.updateData();
+      },
+      deep: true
+    }
   },
   
   beforeDestroy() {
     if (this.chart) {
-      this.chart.dispose()
+      this.chart.dispose();
     }
   },
   
   methods: {
-    // 根据柱体数据计算对应的资源数据（这里可以自定义转换逻辑）
-    calculateResourceFromPredicted(predictedData) {
-      // 示例：根据发电量计算对应的风速或其他资源指标
-      // 这里简单按比例转换，您可以根据实际业务逻辑调整
-      return predictedData.map(value => {
-        // 假设发电量30对应风速7.41，按比例计算
-        const resourceValue = (value / 30) * 7.41
-        return parseFloat(resourceValue.toFixed(2))
-      })
-    },
-    
-    generateRandomData(count, min, max, decimals = 0) {
-      const data = []
-      for (let i = 0; i < count; i++) {
-        const value = Math.random() * (max - min) + min
-        data.push(decimals > 0 ? parseFloat(value.toFixed(decimals)) : Math.round(value))
-      }
-      return data
-    },
-    
-    generateActualData(predictedData) {
-      return predictedData.map(predicted => {
-        const ratio = 0.85 + Math.random() * 0.2
-        return Math.round(predicted * ratio)
-      })
-    },
-    
-    initializeData() {
-      // 根据柱体数据计算资源数据
-      this.chartData.all.month.resource = this.calculateResourceFromPredicted(this.chartData.all.month.predicted)
-    },
-    
     updateData() {
-      const data = this.chartData[this.activeTab][this.timeType]
-      this.totalPredicted = data.predicted.reduce((sum, val) => sum + val, 0)
-      this.totalActual = data.actual.reduce((sum, val) => sum + val, 0)
-      this.completionRate = Math.round((this.totalActual / this.totalPredicted) * 100)
+      const data = this.processedChartData;
+      this.totalPredicted = data.predicted.reduce((sum, val) => sum + val, 0);
       // 计算资源数据的平均值
-      this.avgResource = (data.resource.reduce((sum, val) => sum + val, 0) / data.resource.length).toFixed(2)
+      this.avgResource = data.resource.length > 0 ? 
+        (data.resource.reduce((sum, val) => sum + val, 0) / data.resource.length).toFixed(2) : '0';
     },
     
     initChart() {
       if (!this.$echarts || !this.$refs.chart) {
-        console.error('ECharts 或图表容器不可用')
-        return
+        console.error('ECharts 或图表容器不可用');
+        return;
       }
       
       try {
-        this.chart = this.$echarts.init(this.$refs.chart)
-        this.updateChart()
+        this.chart = this.$echarts.init(this.$refs.chart);
+        this.updateChart();
       } catch (error) {
-        console.error('图表初始化失败:', error)
+        console.error('图表初始化失败:', error);
       }
     },
 
 	updateChart() {
-    if (!this.chart) return
+    if (!this.chart) return;
     
-    const data = this.chartData[this.activeTab][this.timeType]
+    const data = this.processedChartData;
     
     // 动态计算右侧Y轴的最大值
-    const maxResource = Math.max(...data.resource)
-    const rightYAxisMax = Math.ceil(maxResource * 1.2) // 增加20%的余量
-    const rightYAxisInterval = Math.ceil(rightYAxisMax / 5) // 分成5个间隔
+    const maxResource = Math.max(...data.resource);
+    const rightYAxisMax = Math.ceil(maxResource * 1.2); // 增加20%的余量
+    const rightYAxisInterval = Math.ceil(rightYAxisMax / 5); // 分成5个间隔
     
     const option = {
         backgroundColor: 'transparent',
@@ -176,10 +149,10 @@ export default {
                 fontSize:26
             },
             formatter: (params) => {
-                let result = `<div style="padding: 8px 0; border-bottom: 1px solid #333; margin-bottom: 8px;">${params[0].axisValue}</div>`
+                let result = `<div style="padding: 8px 0; border-bottom: 1px solid #333; margin-bottom: 8px;">${params[0].axisValue}</div>`;
                 
                 params.forEach(param => {
-                    let unit = param.seriesName === '平均风速' ? 'm/s' : '万kWh'
+                    let unit = param.seriesName === '平均风速' ? 'm/s' : '万kWh';
                     result += `
                         <div style="margin: 4px 0; display: flex; justify-content: space-between; align-items: center;">
                             <span style="display: flex; align-items: center;">
@@ -188,9 +161,9 @@ export default {
                             </span>
                             <span style="color: #fff; font-weight: bold;">${param.value}${unit}</span>
                         </div>
-                    `
-                })
-                return result
+                    `;
+                });
+                return result;
             }
         },
         legend: {
@@ -272,7 +245,7 @@ export default {
                 barWidth: 25,
                 itemStyle: {
                     // 透明渐变：从底部透明到顶部不透明
-                        color: new this.$echarts.graphic.LinearGradient(0, 1, 0, 0, [
+                    color: new this.$echarts.graphic.LinearGradient(0, 1, 0, 0, [
                         { offset: 0, color: 'rgba(0, 120, 207, 0.1)' }, // 底部：非常透明
                         { offset: 0.3, color: 'rgba(0, 120, 207, 0.3)' }, // 30%处：较透明
                         { offset: 0.6, color: 'rgba(0, 120, 207, 0.6)' }, // 60%处：半透明
@@ -286,7 +259,7 @@ export default {
                 // 添加标记点在柱子顶端
                 markPoint: {
                     symbol: 'rect',
-                    symbolSize: [25, 8], // 宽度20，高度5
+                    symbolSize: [25, 8], // 宽度25，高度8
                     itemStyle: {
                         color: '#00C2FF',
                         borderWidth: 0
@@ -324,15 +297,12 @@ export default {
                     fontSize: 26,
                     formatter: '{c}'
                 }
-            },
+            }
         ]
-
-
-    }
+    };
     
-    this.chart.setOption(option, true)
+    this.chart.setOption(option, true);
 }
-
   }
 }
 </script>

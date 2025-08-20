@@ -11,7 +11,7 @@
 				<div class="PowerGeneration">
                     <div class="PowerGeneration-left">
 						<h2></h2>
-						<div class="staff-vehicle">
+						<div class="staff-vehicle" v-if="getResourceDistributionData.length > 0">
                             <div class="vehicle">
 								<p class="staff-p1">光伏</p>
 								<p class="staff-p2"></p>
@@ -19,23 +19,23 @@
 									<p class="staff-div-p1">
                                         <span class="staff-span1">本月最大风速
                                             <i></i>
-                                            <span>42.34</span>
-                                            <span> m/s</span>
+                                            <span>{{ getResourceDistributionData[0].four_category }}</span>
+                                            <span>{{ getResourceDistributionData[0].description }}</span>
                                         </span>
 										<span class="staff-span2">本月平均风速
                                             <i></i>
-                                            <span>6.89</span>
-                                            <span> m/s</span>
+                                            <span>{{ getResourceDistributionData[0].metric_name }}</span>
+                                            <span> {{ getResourceDistributionData[0].description }}</span>
                                         </span>
 										<span class="staff-span3">昨日最大风速
                                             <i></i>
-                                            <span>42.34</span>
-                                            <span> m/s</span>
+                                            <span>{{ getResourceDistributionData[0].metric_value }}</span>
+                                            <span> {{ getResourceDistributionData[0].description }}</span>
                                         </span>
 										<span class="staff-span4">昨日平均风速
                                             <i></i>
-                                            <span>8.62</span>
-                                            <span> m/s</span>
+                                            <span>{{ getResourceDistributionData[0].unit }}</span>
+                                            <span> {{ getResourceDistributionData[0].description }}</span>
                                         </span>
 									</p>
 								</div>
@@ -47,46 +47,46 @@
 									<p class="staff-div-p1">
 										<span class="staff-span1">本月最大辐照度
                                             <i></i>
-                                            <span>8.28</span>
-                                            <span> W/s2</span>
+											<span>{{ getResourceDistributionData[1].four_category }}</span>
+                                            <span>{{ getResourceDistributionData[1].description }}</span>
                                         </span>
 										<span class="staff-span2">本月平均辐照度
                                              <i></i>
-                                            <span>5.51</span>
-                                            <span> W/s2</span>
+                                             <span>{{ getResourceDistributionData[1].metric_name }}</span>
+                                            <span>{{ getResourceDistributionData[1].description }}</span>
                                         </span>
 										<span class="staff-span3">昨日最大辐照度
                                              <i></i>
-                                            <span>6.3</span>
-                                            <span> W/s2</span>
+											 <span>{{ getResourceDistributionData[1].metric_value }}</span>
+											 <span>{{ getResourceDistributionData[1].description }}</span>
                                         </span>
 										<span class="staff-span4">昨日平均辐照度
                                              <i></i>
-                                            <span>5.02</span>
-                                            <span> W/s2</span>
+											 <span>{{ getResourceDistributionData[1].unit }}</span>
+											 <span>{{ getResourceDistributionData[1].description }}</span>
                                         </span>
 									</p>
 									<p  class="staff-div-Divider"></p>
 									<p class="staff-div-p2">
 										<span class="staff-span1">本月最高温度
                                              <i></i>
-                                            <span>42</span>
-                                            <span> °C</span>
+											 <span>{{ getResourceDistributionData[2].four_category }}</span>
+											 <span>{{ getResourceDistributionData[2].description }}</span>
                                         </span>
 										<span class="staff-span2">本月平均温度
                                              <i></i>
-                                            <span>29.13</span>
-                                            <span>°C</span>
+											 <span>{{ getResourceDistributionData[2].metric_name }}</span>
+											 <span>{{ getResourceDistributionData[2].description }}</span>
                                         </span>
 										<span class="staff-span3">昨日最高温度
                                              <i></i>
-                                            <span>42</span>
-                                            <span> °C</span>
+                                             <span>{{ getResourceDistributionData[2].metric_value }}</span>
+                                            <span>{{ getResourceDistributionData[2].description }}</span>
                                         </span>
 										<span class="staff-span4">昨日平均温度
                                              <i></i>
-                                            <span>36</span>
-                                            <span> °C</span>
+											 <span>{{ getResourceDistributionData[2].unit }}</span>
+											 <span>{{ getResourceDistributionData[2].description }}</span>
                                         </span>
 									</p>
 								</div>
@@ -96,7 +96,7 @@
 					</div>
                     <div class="PowerGeneration-right">
                         <h2></h2>
-						<earlyWarning class="earlyWarning" :events="events" :columns="eventColumns" :priority-config="customPriorityConfig"></earlyWarning>
+						<earlyWarning class="earlyWarning" :events="getWeatherWarningData" :columns="eventColumns"></earlyWarning>
 					</div>
 					
 				</div>
@@ -105,21 +105,21 @@
 						<h2></h2>
 						<h3></h3>
                         <div class="StationStatistics-left-div">
-                            <p v-for="item in Windpowerranking">
-                                <span class="StationStatistics-span1">{{ item.percentage }}</span>
-                                <span class="StationStatistics-span2">{{ item.speed }}<i></i></span>
-                                <span class="StationStatistics-span3">{{ item.name }}</span>
-                            </p>
+							<p v-for="(item, index) in getAverageWindSpeedTopData" :key="index" :class="getBackgroundClass(item.metric_value)">
+									<span class="StationStatistics-span1">{{ item.metric_value }}%</span>
+									<span class="StationStatistics-span2">{{ item.metric_name }}<i> {{ item.unit }}</i></span>
+									<span class="StationStatistics-span3">{{ item.four_category }}</span>
+								</p>
                         </div>
 					</div>
                     <div class="StationStatistics-right">
                         <h2></h2>
                         <h3></h3>
                         <div class="StationStatistics-left-div">
-                            <p v-for="item in radiance">
-                                <span class="StationStatistics-span1">{{ item.percentage }}</span>
-                                <span class="StationStatistics-span2">{{ item.speed }}<i></i></span>
-                                <span class="StationStatistics-span3">{{ item.name }}</span>
+                            <p  v-for="(item, index) in getAverageIrradianceTopData" :key="index" :class="getBackgroundClass(item.metric_value)">
+                                <span class="StationStatistics-span1">{{ item.metric_value }}%</span>
+                                <span class="StationStatistics-span2">{{ item.metric_name }}<i> {{ item.unit }}</i></span>
+                                <span class="StationStatistics-span3">{{ item.four_category }}</span>
                             </p>
                         </div>
 					</div>
@@ -127,11 +127,11 @@
 				<div class="ResourcesSituation">
 					<div class="Equipment-utilization-rate">
 						<h2></h2>
-						<prediction :echartsData="echartsData" :predictionData="chartData"></prediction>
+						<prediction :echartsData="getWindPredictsituationData"></prediction>
 					</div>
 					<div class="situation">
 						<h2></h2>
-						<prediction :echartsData="echartsData1" :predictionData="chartData1"></prediction>
+						<prediction :echartsData="getPhotovoltaicPredictionData"></prediction>
 					</div>
 				</div>
 			</div>
@@ -158,7 +158,7 @@
 				<div class="IndustryBenchmarking">
 					<h2></h2>
 					<div class="contrast">
-						<div class="contrast-left">
+						<div class="contrast-left" v-if="getComparisonOfWindPhotovoltaicsData.length > 0">
 							<p class="contrast-fd">
 								<span class="contrast-fd-span1">风电年累计对比</span>
 								<span class="contrast-fd-span2">(h)</span>
@@ -166,7 +166,7 @@
 							<p class="contrast-Divider"></p>
 							<div class="contrast-div">
 								<p class="contrast-div-p1">
-									<span class="p1-span1">784</span>
+									<span class="p1-span1">{{ getComparisonOfWindPhotovoltaicsData[0].four_category }}</span>
 									<span class="p1-span2"></span>
 									<span class="p1-span3">中电联25年 ( 1~6月 ) 累计</span>
 								</p>
@@ -174,30 +174,30 @@
 								<p class="contrast-div-p3">
 									<span class="p1-span1">新疆公司25年 ( 1~6月 ) 累计</span>
 									<span class="p1-span2"></span>
-									<span class="p1-span3">835</span>
+									<span class="p1-span3">{{ getComparisonOfWindPhotovoltaicsData[1].four_category }}</span>
 								</p>
 							</div>
 							<div style="display: flex;">
 								<div class="contrast-div1">
 									<p>
 										<span>新疆公司25年 ( 1~6月 ) 累计</span>
-										<span>784</span>
+										<span>{{ getComparisonOfWindPhotovoltaicsData[0].metric_name }}</span>
 										<span>同比</span>
-										<span>-4.65% <i class="contrast-decline"></i></span>
+										<span>-{{ getComparisonOfWindPhotovoltaicsData[0].reserve_field }} <i class="contrast-decline"></i></span>
 									</p>
 									<p>
 										<span>中电联25年 ( 1~6月 ) 累计</span>
-										<span>835</span>
+										<span>{{ getComparisonOfWindPhotovoltaicsData[0].metric_value }}	</span>
 									</p>
 									<p>
 										<span>2025年 - 高于行业</span>
-										<span>+45</span>
+										<span>{{ getComparisonOfWindPhotovoltaicsData[0].unit }}</span>
 										<span></span>
 										<span><i class="contrast-rise"></i></span>
 									</p>
 									<p>
-										<span>2025年 - 高于行业</span>
-										<span>+1.10%</span>
+										<span>2025年 - 高于行业平均</span>
+										<span>{{ getComparisonOfWindPhotovoltaicsData[0].description }}</span>
 										<span></span>
 										<span><i class="contrast-rise"></i></span>
 									</p>
@@ -205,37 +205,36 @@
 								<div class="contrast-div2">
 									<p>
 										<span>新疆公司25年 ( 1~6月 ) 累计</span>
-										<span>784</span>
-										
+										<span>{{getComparisonOfWindPhotovoltaicsData[1].metric_name }}</span>
 									</p>
 									<p>
 										<span>中电联25年 ( 1~6月 ) 累计</span>
-										<span>835</span>
+										<span>{{ getComparisonOfWindPhotovoltaicsData[1].metric_name }}	</span>
 									</p>
 									<p>
 										<span>2025年 - 高于行业</span>
-										<span>+45</span>
+										<span>{{ getComparisonOfWindPhotovoltaicsData[1].unit }}</span>
 										<span></span>
 										<span><i class="contrast-rise"></i></span>
 									</p>
 									<p>
-										<span>2025年 - 高于行业</span>
-										<span>+1.10%</span>
+										<span>2025年 - 高于行业平均</span>
+										<span>{{ getComparisonOfWindPhotovoltaicsData[1].description }}</span>
 										<span></span>
 										<span><i class="contrast-rise"></i></span>
 									</p>
 								</div>
 							</div>
 						</div>
-						<div class="contrast-right">
+						<div class="contrast-right"  v-if="getComparisonOfWindPowerData.length > 0">
 							<p class="contrast-fd">
-								<span class="contrast-fd-span1">风电年累计对比</span>
+								<span class="contrast-fd-span1">光伏年累计对比</span>
 								<span class="contrast-fd-span2">(h)</span>
 							</p>
 							<p class="contrast-Divider"></p>
 							<div class="contrast-div">
 								<p class="contrast-div-p1">
-									<span class="p1-span1">784</span>
+									<span class="p1-span1">{{ getComparisonOfWindPowerData[0].four_category }}</span>
 									<span class="p1-span2"></span>
 									<span class="p1-span3">中电联25年 ( 1~6月 ) 累计</span>
 								</p>
@@ -243,30 +242,30 @@
 								<p class="contrast-div-p3">
 									<span class="p1-span1">新疆公司25年 ( 1~6月 ) 累计</span>
 									<span class="p1-span2"></span>
-									<span class="p1-span3">835</span>
+									<span class="p1-span3">{{ getComparisonOfWindPowerData[1].four_category }}</span>
 								</p>
 							</div>
 							<div style="display: flex;">
 								<div class="contrast-div1">
 									<p>
 										<span>新疆公司25年 ( 1~6月 ) 累计</span>
-										<span>784</span>
+										<span>{{ getComparisonOfWindPowerData[0].metric_name }}</span>
 										<span>同比</span>
-										<span>-4.65% <i class="contrast-decline"></i></span>
+										<span>-{{ getComparisonOfWindPowerData[0].reserve_field }} <i class="contrast-decline"></i></span>
 									</p>
 									<p>
 										<span>中电联25年 ( 1~6月 ) 累计</span>
-										<span>835</span>
+										<span>{{ getComparisonOfWindPowerData[0].metric_value }}	</span>
 									</p>
 									<p>
 										<span>2025年 - 高于行业</span>
-										<span>+45</span>
+										<span>{{ getComparisonOfWindPowerData[0].unit }}</span>
 										<span></span>
 										<span><i class="contrast-rise"></i></span>
 									</p>
 									<p>
-										<span>2025年 - 高于行业</span>
-										<span>+1.10%</span>
+										<span>2025年 - 高于行业平均</span>
+										<span>{{ getComparisonOfWindPowerData[0].description }}</span>
 										<span></span>
 										<span><i class="contrast-rise"></i></span>
 									</p>
@@ -274,22 +273,21 @@
 								<div class="contrast-div2">
 									<p>
 										<span>新疆公司25年 ( 1~6月 ) 累计</span>
-										<span>784</span>
-										
+										<span>{{getComparisonOfWindPowerData[1].metric_name }}</span>
 									</p>
 									<p>
 										<span>中电联25年 ( 1~6月 ) 累计</span>
-										<span>835</span>
+										<span>{{ getComparisonOfWindPowerData[1].metric_name }}	</span>
 									</p>
 									<p>
 										<span>2025年 - 高于行业</span>
-										<span>+45</span>
+										<span>{{ getComparisonOfWindPowerData[1].unit }}</span>
 										<span></span>
 										<span><i class="contrast-rise"></i></span>
 									</p>
 									<p>
-										<span>2025年 - 高于行业</span>
-										<span>+1.10%</span>
+										<span>2025年 - 高于行业平均</span>
+										<span>{{ getComparisonOfWindPowerData[1].description }}</span>
 										<span></span>
 										<span><i class="contrast-rise"></i></span>
 									</p>
@@ -301,33 +299,25 @@
 					<div class="benchmarking">
 						<div class="benchmarking-left">	
 							<h3></h3>
-							<HourBenchmarking  
-								:yearbefore="yearbefore"
-								:lastyear="[30, 40, 50, 65, 70, 15, 20, 35, 40, 50, 60, 70]"
-								:thisyear="[11, 22, 33, 45, 95, 28, 30, 84, 81, 93, 20, 36]">
-							</HourBenchmarking>
+							<HourBenchmarking :yearbefore="getWindPowerHoursBenchmarkingData"></HourBenchmarking>
 						</div>
+						<!-- getPhotovoltaicHourBenchmarkingData
+						getWindPowerHoursBenchmarkingData -->
 						<div class="benchmarking-right">
 							<h3><p></p></h3>
-							<HourBenchmarking  
-								:yearbefore="yearbefore"
-								:lastyear="[30, 40, 50, 65, 70, 15, 20, 35, 40, 50, 60, 70]"
-								:thisyear="[11, 22, 33, 45, 95, 28, 30, 84, 81, 93, 20, 36]">
-							</HourBenchmarking>
+							<HourBenchmarking :yearbefore="getPhotovoltaicHourBenchmarkingData"></HourBenchmarking>
 						</div>
 					</div>
 				</div>
 				<div class="ranking">
 					<div class="ranking-left">
 						<h2></h2>
-						<HourlyRanking  :echartsData="[65, 70, 80, 75, 90, 85, 60, 55, 40, 30, 50, 80]"
-						:hourData="[70, 75, 80, 85, 90, 78, 80, 88, 82, 95, 88, 76]"></HourlyRanking>
+						<HourlyRanking :echartsData="getWindPowerHourRankingData"></HourlyRanking>
 						<div class="bottom"></div>
 					</div>
 					<div class="ranking-right">
 						<h2></h2>
-						<HourlyRanking  :echartsData="[1, 2, 3, 4, 5, 5, 0, 5, 4, 3, 5, 8]"
-						:hourData="[7, 7, 8, 8, 9, 7, 8, 8, 8, 9, 8, 7]"></HourlyRanking>
+						<HourlyRanking :echartsData="getRankingOfPhotovoltaicHoursData"></HourlyRanking>
 						<div class="bottom"></div>
 					</div>
 				</div>
@@ -347,8 +337,6 @@ import RiskChart from "@COM/echarts/RiskChart.vue";
 import HourlyRanking from "@COM/echarts/HourlyRanking.vue";
 import HourBenchmarking from "@COM/echarts/HourBenchmarking.vue";
 
-
-
 export default {
   	name: "homeIndex",
   	components: {
@@ -363,93 +351,8 @@ export default {
   	},
 	data() {
 		return {
-			leaderInfo: conf.leaderInfo,
-			currentDate: '2023-06-21',
-			currentTime: '16:26:20',
-			currentWeek: '星期三',
-			currentSource: 'wind',
-			timeInterval: 'monthly',
 			echartsData:{'name': '发电量和资源','all':'全部','wind':'风电','solar':'光伏','IconCurve':'平均风速','unitOfMeasurement':'(m/s)'},
 			echartsData1:{'name': '计划发电情况','all':'全部','wind':'风电','solar':'光伏','IconCurve':'平均辐照度','unitOfMeasurement':'(W/s2)'},
-			yearbefore : [65, 70, 80, 75, 90, 85, 60, 55, 40, 30, 50, 80],
-			lastyear : [30, 40, 50, 65, 70, 15, 20, 35, 40, 50, 60, 70],
-			thisyear : [11, 22, 33, 45, 95, 28, 30, 84, 81, 93, 20, 36],
-            chartData: [644.557, 879.606, 874.198, 956.398, 770.51, 949.894, 1107.971],
-            chartData1: [174.27, 171.39, 181.66, 232.54, 232.26, 208.54, 242.44],
-			statsContentDate:[
-				{'name':'合计','year':'490717','month':'666528','daily':'46.12%',"YoY":'20.43%','MoM':'21.79%'},
-				{'name':'风电','year':'430666','month':'523308','daily':'30.71%',"YoY":'6.27%','MoM':'14.12%'},
-				{'name':'光伏','year':'60050','month':'71610','daily':'39.62%',"YoY":'-11.24%','MoM':'14%'},
-				{'name':'储能','year':'22108','month':'36008','daily':'61.40%',"YoY":'','MoM':''},
-				{'name':'源网荷储','year':'63639','month':'67690','daily':'94.02%',"YoY":'','MoM':''},
-			],
-			Windpowerranking: [
-				{ id: 1, name: '十三间房', speed: 11.08 ,percentage:'99.86%'},
-				{ id: 2, name: '托克逊', speed: 8.75 ,percentage:'99.83%'},
-				{ id: 3, name: '哈密分散式翠岭', speed: 7.78 ,percentage:'100%'},
-				{ id: 4, name: '哈密分散式一期', speed: 6.64 ,percentage:'99.92%'},
-				{ id: 5, name: '哈密烟墩', speed: 6.12 ,percentage:'99.64%'}
-			],
-			radiance: [
-            { id: 1, name: '吉木乃源网荷储光伏', speed: 6.75 ,percentage:'100%'},
-				{ id: 2, name: '尉犁', speed: 6.63 ,percentage:'100%'},
-				{ id: 3, name: '石城子', speed: 5.56 ,percentage:'100%'},
-				{ id: 4, name: '青河', speed: 5.52 ,percentage:'100%'},
-				{ id: 5, name: '英吉沙', speed: 5.45 ,percentage:'100%'}
-			],
-			events: [
-				{
-				id: 1,
-				priority: 1,
-				content: '问题某一明天风速急剧增',
-				location: '问题某一明',
-				time: '2018-03-14 10:27:00',
-				operator: '张三'
-				},
-				{
-				id: 2,
-				priority: 3,
-				content: '问题某一明天风速急剧增',
-				location: '',
-				time: '2018-03-14 10:27:00'
-				},
-				{
-				id: 2,
-				priority: 2,
-				content: '问题某一明天风速急剧增',
-				location: '',
-				time: '2018-03-14 10:27:00'
-				},
-				{
-				id: 2,
-				priority: 1,
-				content: '问题某一明天风速急剧增',
-				location: '',
-				time: '2018-03-14 10:27:00'
-				},
-				{
-				id: 2,
-				priority: 3,
-				content: '问题某一明天风速急剧增',
-				location: '',
-				time: '2018-03-14 10:27:00'
-				},
-				{
-				id: 2,
-				priority: 3,
-				content: '问题某一明天风速急剧增',
-				location: '',
-				time: '2018-03-14 10:27:00'
-				},
-				{
-				id: 2,
-				priority: 3,
-				content: '问题某一明天风速急剧增',
-				location: '',
-				time: '2018-03-14 10:27:00'
-				},
-				// ... 更多数据
-			],
 			// 列配置
 			eventColumns: [
 				{ 
@@ -473,17 +376,47 @@ export default {
 				}
 				}
 			],
-			// 自定义优先级配置
-			customPriorityConfig: {
-				1: { text: '问题某一明', color: '#ff4757' },
-				2: { text: '问题某一明', color: '#ffa726' },
-				3: { text: '问题某一明', color: '#2ed573' },
-			}
+			//资源禀赋/资源分布/风电/光伏
+			getResourceDistributionData:[],
+			//资源禀赋/天气预警
+			getWeatherWarningData: [],
+			//资源禀赋/风电月度最大平均风速TOP5
+			getAverageWindSpeedTopData :[],
+			//getAverageIrradianceTop
+			getAverageIrradianceTopData:[],
+			//资源禀赋/风电未来7日预测发电情况
+			getWindPredictsituationData:[],
+			//资源禀赋/光伏未来7日预测发电情况
+			getPhotovoltaicPredictionData:[],
+			//资源禀赋/行业对标/光伏小时数对标
+			getPhotovoltaicHourBenchmarkingData:[],
+			//资源禀赋/行业对标/风电小时数对标
+			getWindPowerHoursBenchmarkingData:[],
+			//资源禀赋/行业对标/光伏年累计对比
+			getComparisonOfWindPhotovoltaicsData:[],
+			//资源禀赋/行业对标/风电年累计对比
+			getComparisonOfWindPowerData: [],
+			//资源禀赋/风电小时数排名
+			getWindPowerHourRankingData:[],
+			//资源禀赋/光伏小时数排名
+			getRankingOfPhotovoltaicHoursData:[],
 		}
 	},
 	created() {
 	},
   	mounted() {
+		this.getResourceDistribution();
+		this.getWeatherWarning();
+		this.getAverageWindSpeedTop();
+		this.getAverageIrradianceTop();
+		this.getWindPredictsituation();
+		this.getPhotovoltaicPrediction();
+		this.getPhotovoltaicHourBenchmarking();
+		this.getWindPowerHoursBenchmarking();
+		this.getComparisonOfWindPhotovoltaics();
+		this.getComparisonOfWindPower();
+		this.getWindPowerHourRanking();
+		this.getRankingOfPhotovoltaicHours();
 	},
 	beforeDestroy(){
 	},
@@ -500,6 +433,171 @@ export default {
 		"SET_FJ_TYPE",
 		"SET_REGIONBGFLAG"
 		]),
+		getResourceDistribution() {
+			this.$http.sx.getResourceDistribution({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getResourceDistributionData = res.data.rowData;
+				}
+				
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getWeatherWarning() {
+			this.$http.sx.getWeatherWarning({
+			}).then(res => {
+				if (res.code === 0) {
+					res.data.rowData.map((i,index)=>{
+						this.getWeatherWarningData.push({id:index,priority:i.sub_category,content:i.four_category,time:i.metric_name,mid_category:i.mid_category})
+						
+					})
+				}
+				
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getAverageWindSpeedTop() {
+			this.$http.sx.getAverageWindSpeedTop({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getAverageWindSpeedTopData = res.data.rowData;
+				}
+				
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getAverageIrradianceTop() {
+			this.$http.sx.getAverageIrradianceTop({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getAverageIrradianceTopData = res.data.rowData;
+				}
+				
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getWindPredictsituation() {
+			this.$http.sx.getWindPredictsituation({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getWindPredictsituationData = res.data.rowData;
+					this.getWindPredictsituationData.IconCurve = '平均风速';
+				}
+				
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getPhotovoltaicPrediction() {
+			this.$http.sx.getPhotovoltaicPrediction({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getPhotovoltaicPredictionData = res.data.rowData;
+					this.getPhotovoltaicPredictionData.IconCurve = '平均辐照度';
+				}
+				
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getPhotovoltaicHourBenchmarking() {
+			this.$http.sx.getPhotovoltaicHourBenchmarking({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getPhotovoltaicHourBenchmarkingData = res.data.rowData;
+				}
+				
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getWindPowerHoursBenchmarking() {
+			this.$http.sx.getWindPowerHoursBenchmarking({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getWindPowerHoursBenchmarkingData = res.data.rowData;
+				}
+				
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getComparisonOfWindPhotovoltaics() {
+			this.$http.sx.getComparisonOfWindPhotovoltaics({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getComparisonOfWindPhotovoltaicsData = res.data.rowData;
+				}
+				
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getComparisonOfWindPower() {
+			this.$http.sx.getComparisonOfWindPower({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getComparisonOfWindPowerData = res.data.rowData;
+				}
+				
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getWindPowerHourRanking() {
+			this.$http.sx.getWindPowerHourRanking({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getWindPowerHourRankingData = res.data.rowData;
+				}
+				
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getRankingOfPhotovoltaicHours() {
+			this.$http.sx.getRankingOfPhotovoltaicHours({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getRankingOfPhotovoltaicHoursData = res.data.rowData;
+				}
+				
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getBackgroundClass(metricValue) {
+			// 提取百分比数值
+			const percentage = parseFloat(metricValue.replace('%', ''));
+			// 根据百分比返回对应的CSS类名
+			if (percentage >= 100) {
+				return 'bg-100';
+			}else if (percentage >= 90) {
+				return 'bg-90-100';
+			} else if (percentage >= 80) {
+				return 'bg-80-90';
+			} else if (percentage >= 70) {
+				return 'bg-70-80';
+			} else if (percentage >= 60) {
+				return 'bg-60-70';
+			} else if (percentage >= 50) {
+				return 'bg-50-60';
+			} else if (percentage >= 40) {
+				return 'bg-40-50';
+			} else if (percentage >= 30) {
+				return 'bg-30-40';
+			} else if (percentage >= 20) {
+				return 'bg-20-30';
+			} else if (percentage >= 10) {
+				return 'bg-10-20';
+			} else {
+				return 'bg-0-10';
+			}
+		}
 	},
 }
 </script>
@@ -798,6 +896,15 @@ export default {
                     text-align: center;
                     margin-top: 250px;
                     background: url("../../../assets/images/CompanyOverview/fengsu.png") 20% center no-repeat;
+					padding-left: 30px;
+					i{
+						color: #FFF;
+						font-family: "Alibaba PuHuiTi 2.0";
+						font-size: 26px;
+						font-style: normal;
+						font-weight: 500;
+						line-height: normal;
+					}
                 }
             }
             .StationStatistics-right{
@@ -820,6 +927,15 @@ export default {
                     text-align: center;
                     margin-top: 250px;
                     background: url("../../../assets/images/CompanyOverview/guangzhao.png") 20% center no-repeat;
+					padding-left: 30px;
+					i{
+						color: #FFF;
+						font-family: "Alibaba PuHuiTi 2.0";
+						font-size: 26px;
+						font-style: normal;
+						font-weight: 500;
+						line-height: normal;
+					}
                 }
             }
             .StationStatistics-left-div{
@@ -830,7 +946,6 @@ export default {
                 p{
                     width: 250px;
                     height: 402px;
-                    background: #f90;
                     span{
                         font-style: normal;
                         line-height: normal;
@@ -1034,7 +1149,6 @@ export default {
 						display: flex;
 						gap: 30px;
 						.contrast-div-p1{
-							width: 559px;
 							height: 100px;
 							background: url("../../../assets/images/CompanyOverview/fengdiannianduibi.png") center 100% no-repeat;	
 							padding-left:20px ;
@@ -1316,6 +1430,58 @@ export default {
   background: url("../../../assets/images/homepage/Backgroundimage1.png") center center no-repeat;
   background-size: 100% 100%;
 }
+.bg-100 {
+    background: url("../../../assets/images/CompanyOverview/bg-90-100.png") center center no-repeat;
+    background-size: cover; // 或者您需要的其他尺寸设置
+}
+.bg-90-100 {
+    background: url("../../../assets/images/CompanyOverview/bg-90-100.png") center center no-repeat;
+    background-size: cover; // 或者您需要的其他尺寸设置
+}
 
+.bg-80-90 {
+    background: url("../../../assets/images/CompanyOverview/bg-80-90.png") center center no-repeat;
+    background-size: cover;
+}
+
+.bg-70-80 {
+    background: url("../../../assets/images/CompanyOverview/bg-70-80.png") center center no-repeat;
+    background-size: cover;
+}
+
+.bg-60-70 {
+    background: url("../../../assets/images/CompanyOverview/bg-60-70.png") center center no-repeat;
+    background-size: cover;
+}
+
+.bg-50-60 {
+    background: url("../../../assets/images/CompanyOverview/bg-50-60.png") center center no-repeat;
+    background-size: cover;
+}
+
+.bg-40-50 {
+    background: url("../../../assets/images/CompanyOverview/bg-40-50.png") center center no-repeat;
+    background-size: cover;
+}
+
+.bg-30-40 {
+    background: url("../../../assets/images/CompanyOverview/bg-30-40.png") center center no-repeat;
+    background-size: cover;
+}
+
+.bg-20-30 {
+    background: url("../../../assets/images/CompanyOverview/bg-20-30.png") center center no-repeat;
+    background-size: cover;
+}
+
+.bg-10-20 {
+    background: url("../../../assets/images/CompanyOverview/bg-10-20.png") center center no-repeat;
+    background-size: cover;
+}
+
+.bg-0-10 {
+    background: url("../../../assets/images/CompanyOverview/bg-0-10.png") center center no-repeat;
+    background-size: cover;
+}
 
 </style>

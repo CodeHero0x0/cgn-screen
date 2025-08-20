@@ -69,11 +69,15 @@
 	  <div ref="chart" class="chart-container"></div>
 	</div>
 </template>
+
 <script>
 export default {
   name: 'PowerGenerationChart',
   props:[
-	'echartsData'
+	'echartsData',
+	'all',
+	'windPower',
+	'photovoltaic',
   ],
   data() {
     return {
@@ -86,7 +90,7 @@ export default {
       completionRate: 0,
       avgResource: 0,
       
-      // 图表数据 - 添加all数据
+      // 图表数据
       chartData: {
         all: {
 			month: {
@@ -102,26 +106,26 @@ export default {
         },
         wind: {
 			month: {
-				predicted: this.generateRandomData(12, 800, 1200), // 12个月，800-1200范围
+				predicted: [],
 				actual: [],
-				resource: this.generateRandomData(12, 5.0, 10.0, 1) // 风速 5-10 m/s，保留1位小数
+				resource: []
 			},
 			year: {
-				predicted: this.generateRandomData(5, 10000, 15000), // 5年，10000-15000范围
+				predicted: [],
 				actual: [],
-				resource: this.generateRandomData(5, 6.0, 9.0, 1) // 年度平均风速
+				resource: []
 			}
         },
         solar: {
 			month: {
-				predicted: this.generateRandomData(12, 250, 450), // 12个月，250-450范围
+				predicted: [],
 				actual: [],
-				resource: this.generateRandomData(12, 2.5, 7.0, 1) // 太阳辐照度 2.5-7.0 kWh/m²
+				resource: []
 			},
 			year: {
-				predicted: this.generateRandomData(5, 4000, 5500), // 5年，4000-5500范围
+				predicted: [],
 				actual: [],
-				resource: this.generateRandomData(5, 4.0, 6.0, 1) // 年度平均辐照度
+				resource: []
 			}
         }
       }
@@ -151,6 +155,40 @@ export default {
     }
   },
   
+  watch: {
+    // 监听props变化，重新初始化数据
+    all: {
+      handler() {
+        this.initializeData()
+        this.$nextTick(() => {
+          this.updateChart()
+          this.updateData()
+        })
+      },
+      deep: true
+    },
+    windPower: {
+      handler() {
+        this.initializeData()
+        this.$nextTick(() => {
+          this.updateChart()
+          this.updateData()
+        })
+      },
+      deep: true
+    },
+    photovoltaic: {
+      handler() {
+        this.initializeData()
+        this.$nextTick(() => {
+          this.updateChart()
+          this.updateData()
+        })
+      },
+      deep: true
+    }
+  },
+  
   methods: {
     generateRandomData(count, min, max, decimals = 0) {
       const data = []
@@ -169,46 +207,147 @@ export default {
       })
     },
     
-    // 初始化数据
-    initializeData() {
-      // 为wind生成实际发电量
-      this.chartData.wind.month.actual = this.generateActualData(this.chartData.wind.month.predicted)
-      this.chartData.wind.year.actual = this.generateActualData(this.chartData.wind.year.predicted)
-      
-      // 为solar生成实际发电量
-      this.chartData.solar.month.actual = this.generateActualData(this.chartData.solar.month.predicted)
-      this.chartData.solar.year.actual = this.generateActualData(this.chartData.solar.year.predicted)
-      
-      // 计算全部数据
-      this.calculateAllData()
+    // 生成预测发电量（基于实际值的95%-115%）
+    generatePredictedData(actualData) {
+      return actualData.map(actual => {
+        const ratio = 0.95 + Math.random() * 0.2 // 95%-115%
+        return Math.round(actual * ratio)
+      })
     },
     
-    // 计算风电和光伏的总和数据
-    calculateAllData() {
-      // 计算月度数据
-      this.chartData.all.month.predicted = this.chartData.wind.month.predicted.map((val, index) => 
-        val + this.chartData.solar.month.predicted[index]
-      )
-      this.chartData.all.month.actual = this.chartData.wind.month.actual.map((val, index) => 
-        val + this.chartData.solar.month.actual[index]
-      )
-      // 资源情况取平均值（风速和辐照度单位不同，取平均值作为综合指标）
-      this.chartData.all.month.resource = this.chartData.wind.month.resource.map((val, index) => 
-        ((val + this.chartData.solar.month.resource[index]) / 2).toFixed(1)
-      ).map(val => parseFloat(val))
-      
-      // 计算年度数据
-      this.chartData.all.year.predicted = this.chartData.wind.year.predicted.map((val, index) => 
-        val + this.chartData.solar.year.predicted[index]
-      )
-      this.chartData.all.year.actual = this.chartData.wind.year.actual.map((val, index) => 
-        val + this.chartData.solar.year.actual[index]
-      )
-      this.chartData.all.year.resource = this.chartData.wind.year.resource.map((val, index) => 
-        ((val + this.chartData.solar.year.resource[index]) / 2).toFixed(1)
-      ).map(val => parseFloat(val))
-    },
+	// 解析数据格式的辅助方法
+	parseDataArray(dataArray) {
+	if (!dataArray || !Array.isArray(dataArray) || dataArray.length === 0) {
+		return null
+	}
+	
+	// 按月份排序
+	const sortedData = [...dataArray].sort((a, b) => {
+		const monthA = parseInt(a.four_category.replace('月', ''))
+		const monthB = parseInt(b.four_category.replace('月', ''))
+		return monthA - monthB
+	})
+	
+	return {
+		predicted: sortedData.map(item => parseFloat(item.metric_name) || 0),
+		actual: sortedData.map(item => parseFloat(item.metric_value) || 0),
+		resource: sortedData.map(item => parseFloat(item.unit) || 0)
+	}
+	},
     
+	initializeData() {
+	// 解析传入的数据
+	const allData = this.parseDataArray(this.all)
+	const windData = this.parseDataArray(this.windPower)
+	const solarData = this.parseDataArray(this.photovoltaic)
+	
+	if (allData && windData && solarData) {
+		// 如果有全部数据，直接使用全部数据的资源情况
+		this.chartData.all.month = {
+		predicted: [...allData.predicted],
+		actual: [...allData.actual],
+		resource: [...allData.resource]  // 直接使用全部数据的资源情况，不计算平均值
+		}
+		
+		this.chartData.wind.month = {
+		predicted: [...windData.predicted],
+		actual: [...windData.actual],
+		resource: [...windData.resource]
+		}
+		
+		this.chartData.solar.month = {
+		predicted: [...solarData.predicted],
+		actual: [...solarData.actual],
+		resource: [...solarData.resource]
+		}
+		
+		console.log('使用原始数据 - 全部资源情况:', this.chartData.all.month.resource)
+		
+	} else if (windData && solarData) {
+		// 如果没有全部数据，但有风电和光伏数据，则计算全部数据
+		this.chartData.wind.month = {
+		predicted: [...windData.predicted],
+		actual: [...windData.actual],
+		resource: [...windData.resource]
+		}
+		
+		this.chartData.solar.month = {
+		predicted: [...solarData.predicted],
+		actual: [...solarData.actual],
+		resource: [...solarData.resource]
+		}
+		
+		// 计算全部数据的平均值
+		this.calculateAllDataFromWindAndSolar()
+		
+	} else if (allData) {
+		// 如果只有全部数据，直接使用
+		this.chartData.all.month = {
+		predicted: [...allData.predicted],
+		actual: [...allData.actual],
+		resource: [...allData.resource]
+		}
+		
+		// 为风电和光伏生成默认数据
+		this.chartData.wind.month.predicted = this.generateRandomData(12, 800, 1200)
+		this.chartData.wind.month.actual = this.generateActualData(this.chartData.wind.month.predicted)
+		this.chartData.wind.month.resource = this.generateRandomData(12, 5.0, 10.0, 1)
+		
+		this.chartData.solar.month.predicted = this.generateRandomData(12, 250, 450)
+		this.chartData.solar.month.actual = this.generateActualData(this.chartData.solar.month.predicted)
+		this.chartData.solar.month.resource = this.generateRandomData(12, 2.5, 7.0, 1)
+		
+		console.log('只有全部数据 - 资源情况:', this.chartData.all.month.resource)
+		
+	} else {
+		// 如果props数据不存在，使用默认随机数据
+		this.chartData.wind.month.predicted = this.generateRandomData(12, 800, 1200)
+		this.chartData.wind.month.actual = this.generateActualData(this.chartData.wind.month.predicted)
+		this.chartData.wind.month.resource = this.generateRandomData(12, 5.0, 10.0, 1)
+		
+		this.chartData.solar.month.predicted = this.generateRandomData(12, 250, 450)
+		this.chartData.solar.month.actual = this.generateActualData(this.chartData.solar.month.predicted)
+		this.chartData.solar.month.resource = this.generateRandomData(12, 2.5, 7.0, 1)
+		
+		// 计算全部数据
+		this.calculateAllData()
+	}
+	
+	// ... 年度数据处理保持不变
+	},
+    
+	// 新增方法：从风电和光伏数据计算全部数据
+	calculateAllDataFromWindAndSolar() {
+	// 计算预测发电量总和
+	this.chartData.all.month.predicted = this.chartData.wind.month.predicted.map((val, index) => 
+		val + this.chartData.solar.month.predicted[index]
+	)
+	
+	// 计算实际发电量总和
+	this.chartData.all.month.actual = this.chartData.wind.month.actual.map((val, index) => 
+		val + this.chartData.solar.month.actual[index]
+	)
+	
+	// 计算资源情况平均值（风速和辐照度的平均值作为综合资源指标）
+	this.chartData.all.month.resource = this.chartData.wind.month.resource.map((val, index) => 
+		parseFloat(((val + this.chartData.solar.month.resource[index]) / 2).toFixed(1))
+	)
+	},
+
+	// 修改原有的计算方法
+	calculateAllData() {
+	// 计算月度数据
+	this.chartData.all.month.predicted = this.chartData.wind.month.predicted.map((val, index) => 
+		val + this.chartData.solar.month.predicted[index]
+	)
+	this.chartData.all.month.actual = this.chartData.wind.month.actual.map((val, index) => 
+		val + this.chartData.solar.month.actual[index]
+	)
+	// 资源情况取平均值（风速和辐照度单位不同，取平均值作为综合指标）
+	this.chartData.all.month.resource = this.chartData.wind.month.resource.map((val, index) => 
+		parseFloat(((val + this.chartData.solar.month.resource[index]) / 2).toFixed(1))
+	)
+	},
     // 重新生成随机数据的方法（可选）
     refreshData() {
       // 重新生成wind数据
@@ -231,7 +370,6 @@ export default {
       this.updateData()
     },
     
-    // 其他方法保持不变...
     switchTab(tab) {
       this.activeTab = tab
       this.updateChart()
@@ -291,6 +429,7 @@ export default {
         console.error('图表初始化失败:', error)
       }
     },
+	
 	updateChart() {
 		if (!this.chart) return
 		
@@ -309,52 +448,51 @@ export default {
 				containLabel: true
 			},
 			tooltip: {
-			// ... tooltip配置保持不变
-			trigger: 'axis',
-			axisPointer: {
-				type: 'cross',
-				crossStyle: {
-				color: '#999'
-				}
-			},
-			backgroundColor: 'rgba(0, 0, 0, 0.85)',
-			borderColor: '#00ccff',
-			borderWidth: 2,
-			textStyle: {
-				color: '#fff',
-				fontSize: 26,
-				fontWeight: 'bold'
-			},
-			formatter: (params) => {
-				let result = `<div style="padding: 8px 0; border-bottom: 1px solid #333; margin-bottom: 8px; font-size: 14px; color: #00ccff;">${params[0].axisValue}</div>`
-				
-				params.forEach(param => {
-				let unit = '万kWh'
-				let percentage = ''
-				
-				if (param.seriesName === '资源情况') {
-					if (this.activeTab === 'all') {
-					unit = ''
-					} else {
-					unit = this.activeTab === 'wind' ? 'm/s' : 'kWh/m²'
+				trigger: 'axis',
+				axisPointer: {
+					type: 'cross',
+					crossStyle: {
+					color: '#999'
 					}
-				} else if (param.seriesName === '实际发电量') {
-					const predictedValue = params.find(p => p.seriesName === '预测发电量')?.value || param.value
-					percentage = ` (${Math.round((param.value / predictedValue) * 100)}%)`
+				},
+				backgroundColor: 'rgba(0, 0, 0, 0.85)',
+				borderColor: '#00ccff',
+				borderWidth: 2,
+				textStyle: {
+					color: '#fff',
+					fontSize: 26,
+					fontWeight: 'bold'
+				},
+				formatter: (params) => {
+					let result = `<div style="padding: 8px 0; border-bottom: 1px solid #333; margin-bottom: 8px; font-size: 14px; color: #00ccff;">${params[0].axisValue}</div>`
+					
+					params.forEach(param => {
+					let unit = '万kWh'
+					let percentage = ''
+					
+					if (param.seriesName === '资源情况') {
+						if (this.activeTab === 'all') {
+						unit = ''
+						} else {
+						unit = this.activeTab === 'wind' ? 'm/s' : 'kWh/m²'
+						}
+					} else if (param.seriesName === '实际发电量') {
+						const predictedValue = params.find(p => p.seriesName === '预测发电量')?.value || param.value
+						percentage = ` (${Math.round((param.value / predictedValue) * 100)}%)`
+					}
+					
+					result += `
+						<div style="margin: 8px 0; display: flex; justify-content: space-between; align-items: center;">
+						<span style="display: flex; align-items: center;">
+							<span style="display: inline-block; width: 12px; height: 12px; background: ${param.color}; margin-right: 8px; border-radius: ${param.seriesName === '资源情况' ? '50%' : '2px'};"></span>
+							${param.seriesName}
+						</span>
+						<span style="color: #fff; font-weight: bold;">${param.value}${unit}${percentage}</span>
+						</div>
+					`
+					})
+					return result
 				}
-				
-				result += `
-					<div style="margin: 8px 0; display: flex; justify-content: space-between; align-items: center;">
-					<span style="display: flex; align-items: center;">
-						<span style="display: inline-block; width: 12px; height: 12px; background: ${param.color}; margin-right: 8px; border-radius: ${param.seriesName === '资源情况' ? '50%' : '2px'};"></span>
-						${param.seriesName}
-					</span>
-					<span style="color: #fff; font-weight: bold;">${param.value}${unit}${percentage}</span>
-					</div>
-				`
-				})
-				return result
-			}
 			},
 			legend: {
 			show: false
@@ -387,7 +525,7 @@ export default {
 				type: 'value',
 				name: '',
 				nameTextStyle: {
-				color: '#7ec7ff',
+				color: '#f90',
 				fontSize: 26,
 				},
 				position: 'left',
@@ -449,110 +587,127 @@ export default {
 			}
 			],
 			series: [
-			// ... series配置保持不变
-			{
-				name: '预测发电量',
-				type: 'bar',
-				yAxisIndex: 0,
-				data: data.predicted,
-				barWidth: '15%',
-				barGap: '75%',
-				itemStyle: {
-				color: new this.$echarts.graphic.LinearGradient(0, 0, 0, 1, [
-					{ offset: 0, color: '#8BFFE3' },
-					{ offset: 0.3, color: 'rgba(139, 255, 227, 0.8)' },
-					{ offset: 0.7, color: 'rgba(139, 255, 227, 0.6)' },
-					{ offset: 1, color: 'rgba(139, 255, 227, 0.3)' }
-				]),
-				borderColor: '#8BFFE3',
-				borderWidth: 1,
-				borderRadius: [8, 8, 0, 0],
-				shadowColor: 'rgba(139, 255, 227, 0.4)',
-				shadowBlur: 8,
-				shadowOffsetY: 2
+				{
+					name: '预测发电量',
+					type: 'bar',
+					yAxisIndex: 0,
+					data: data.predicted,
+					barWidth: 25,
+					itemStyle: {
+						// 透明渐变：从底部透明到顶部不透明，颜色为#0078CF
+						color: new this.$echarts.graphic.LinearGradient(0, 1, 0, 0, [
+							{ offset: 0, color: 'rgba(0, 120, 207, 0.1)' }, // 底部：非常透明
+							{ offset: 0.3, color: 'rgba(0, 120, 207, 0.2)' }, // 30%处：较透明
+							{ offset: 0.6, color: 'rgba(0, 120, 207, 0.4)' }, // 60%处：半透明
+							{ offset: 1, color: 'rgba(0, 120, 207, 0.6)' }    // 顶部：基本不透明
+						]),
+						borderColor: '#0078CF',
+						borderWidth: 0,
+						borderRadius: [0, 0, 0, 0]
+					},
+					// 添加标记点在柱子顶端，颜色为#00C2FF
+					markPoint: {
+						symbol: 'rect',
+						symbolSize: [25, 8], // 宽度25，高度8
+						itemStyle: {
+							color: '#00C2FF',
+							borderWidth: 0
+						},
+						data: data.predicted.map((value, index) => ({
+							coord: [index, value], // 在柱子顶端的坐标
+							value: ''
+						})),
+						silent: true,
+						tooltip: {
+							show: false
+						}
+					}
 				},
-				emphasis: {
-				itemStyle: {
-					shadowColor: 'rgba(139, 255, 227, 0.6)',
-					shadowBlur: 12
-				}
-				}
-			},
-			{
-				name: '实际发电量',
-				type: 'bar',
-				yAxisIndex: 0,
-				data: data.actual,
-				barWidth: '15%',
-				itemStyle: {
-				color: new this.$echarts.graphic.LinearGradient(0, 0, 0, 1, [
-					{ offset: 0, color: '#00C2FF' },
-					{ offset: 0.3, color: 'rgba(0, 194, 255, 0.8)' },
-					{ offset: 0.7, color: 'rgba(0, 194, 255, 0.6)' },
-					{ offset: 1, color: 'rgba(0, 194, 255, 0.3)' }
-				]),
-				borderColor: '#00C2FF',
-				borderWidth: 1,
-				borderRadius: [8, 8, 0, 0],
-				shadowColor: 'rgba(0, 194, 255, 0.4)',
-				shadowBlur: 8,
-				shadowOffsetY: 2
+				{
+					name: '实际发电量',
+					type: 'bar',
+					yAxisIndex: 0,
+					data: data.actual,
+					barWidth: 25,
+					itemStyle: {
+						// 透明渐变：从底部透明到顶部不透明，颜色为#00C0FF
+						color: new this.$echarts.graphic.LinearGradient(0, 1, 0, 0, [
+							{ offset: 0, color: 'rgba(0, 192, 255, 0.1)' }, // 底部：非常透明
+							{ offset: 0.3, color: 'rgba(0, 192, 255, 0.2)' }, // 30%处：较透明
+							{ offset: 0.6, color: 'rgba(0, 192, 255, 0.4)' }, // 60%处：半透明
+							{ offset: 1, color: 'rgba(0, 192, 255, 0.6)' }    // 顶部：基本不透明
+						]),
+						borderColor: '#00C0FF',
+						borderWidth: 0,
+						borderRadius: [0, 0, 0, 0]
+					},
+					// 添加标记点在柱子顶端，颜色为#23FFFC
+					markPoint: {
+						symbol: 'rect',
+						symbolSize: [25, 8], // 宽度25，高度8
+						itemStyle: {
+							color: '#23FFFC',
+							borderWidth: 0
+						},
+						data: data.actual.map((value, index) => ({
+							coord: [index, value], // 在柱子顶端的坐标
+							value: ''
+						})),
+						silent: true,
+						tooltip: {
+							show: false
+						}
+					}
 				},
-				emphasis: {
-				itemStyle: {
-					shadowColor: 'rgba(0, 194, 255, 0.6)',
-					shadowBlur: 12
+				{
+					name: '资源情况',
+					type: 'line',
+					yAxisIndex: 1,
+					data: data.resource,
+					smooth: true,
+					symbol: 'circle',
+					symbolSize: 8,
+					lineStyle: {
+						color: '#fff',
+						width: 3,
+						shadowColor: 'rgba(255, 255, 255, 0.5)',
+						shadowBlur: 10,
+						shadowOffsetY: 2
+					},
+					itemStyle: {
+						color: '#fff',
+						borderColor: '#7ec7ff',
+						borderWidth: 2,
+						shadowColor: 'rgba(255, 255, 255, 0.8)',
+						shadowBlur: 8
+					},
+					emphasis: {
+						itemStyle: {
+							color: '#fff',
+							borderColor: '#00ccff',
+							borderWidth: 3,
+							shadowColor: 'rgba(255, 255, 255, 1)',
+							shadowBlur: 15,
+							scale: 1.2
+						},
+						lineStyle: {
+							width: 4,
+							shadowBlur: 15
+						}
+					},
+					areaStyle: {
+						color: new this.$echarts.graphic.LinearGradient(0, 0, 0, 1, [
+							{ offset: 0, color: 'rgba(255, 255, 255, 0.2)' },
+							{ offset: 1, color: 'rgba(255, 255, 255, 0.05)' }
+						])
+					}
 				}
-				}
-			},
-			{
-				name: '资源情况',
-				type: 'line',
-				yAxisIndex: 1,
-				data: data.resource,
-				smooth: true,
-				symbol: 'circle',
-				symbolSize: 8,
-				lineStyle: {
-				color: '#fff',
-				width: 3,
-				shadowColor: 'rgba(255, 255, 255, 0.5)',
-				shadowBlur: 10,
-				shadowOffsetY: 2
-				},
-				itemStyle: {
-				color: '#fff',
-				borderColor: '#7ec7ff',
-				borderWidth: 2,
-				shadowColor: 'rgba(255, 255, 255, 0.8)',
-				shadowBlur: 8
-				},
-				emphasis: {
-				itemStyle: {
-					color: '#fff',
-					borderColor: '#00ccff',
-					borderWidth: 3,
-					shadowColor: 'rgba(255, 255, 255, 1)',
-					shadowBlur: 15,
-					scale: 1.2
-				},
-				lineStyle: {
-					width: 4,
-					shadowBlur: 15
-				}
-				},
-				areaStyle: {
-				color: new this.$echarts.graphic.LinearGradient(0, 0, 0, 1, [
-					{ offset: 0, color: 'rgba(255, 255, 255, 0.2)' },
-					{ offset: 1, color: 'rgba(255, 255, 255, 0.05)' }
-				])
-				}
-			}
 			]
+
+
 		}
 		this.chart.setOption(option, true)
 	}
-
   }
 }
 </script>

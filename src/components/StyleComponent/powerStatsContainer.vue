@@ -46,12 +46,12 @@
           <div class="card-value">{{ currentData.firstRow.card1.value }}</div>
           <div class="card-stats">
             <span class="stat-item">
-              同比 <span class="positive">{{ currentData.firstRow.card1.yearOverYear }}</span>
-              <span class="arrow-up"></span>
+              同比 <span :class="getStatClass(currentData.firstRow.card1.yearOverYear)">{{ currentData.firstRow.card1.yearOverYear }}</span>
+              <span :class="getArrowClass(currentData.firstRow.card1.yearOverYear)"></span>
             </span>
             <span class="stat-item">
-              环比 <span class="positive">{{ currentData.firstRow.card1.monthOverMonth }}</span>
-              <span class="arrow-up"></span>
+              环比 <span :class="getStatClass(currentData.firstRow.card1.monthOverMonth)">{{ currentData.firstRow.card1.monthOverMonth }}</span>
+              <span :class="getArrowClass(currentData.firstRow.card1.monthOverMonth)"></span>
             </span>
           </div>
         </div>
@@ -64,12 +64,12 @@
           <div class="card-value">{{ currentData.firstRow.card2.value }}</div>
           <div class="card-stats">
             <span class="stat-item">
-              同比 <span class="positive">{{ currentData.firstRow.card2.yearOverYear }}</span>
-              <span class="arrow-up"></span>
+              同比 <span :class="getStatClass(currentData.firstRow.card2.yearOverYear)">{{ currentData.firstRow.card2.yearOverYear }}</span>
+              <span :class="getArrowClass(currentData.firstRow.card2.yearOverYear)"></span>
             </span>
             <span class="stat-item">
-              环比 <span class="positive">{{ currentData.firstRow.card2.monthOverMonth }}</span>
-              <span class="arrow-up"></span>
+              环比 <span :class="getStatClass(currentData.firstRow.card2.monthOverMonth)">{{ currentData.firstRow.card2.monthOverMonth }}</span>
+              <span :class="getArrowClass(currentData.firstRow.card2.monthOverMonth)"></span>
             </span>
           </div>
         </div>
@@ -82,12 +82,12 @@
           <div class="card-value">{{ currentData.firstRow.card3.value }}</div>
           <div class="card-stats">
             <span class="stat-item">
-              同比 <span class="positive">{{ currentData.firstRow.card3.yearOverYear }}</span>
-              <span class="arrow-up"></span>
+              同比 <span :class="getStatClass(currentData.firstRow.card3.yearOverYear)">{{ currentData.firstRow.card3.yearOverYear }}</span>
+              <span :class="getArrowClass(currentData.firstRow.card3.yearOverYear)"></span>
             </span>
             <span class="stat-item">
-              环比 <span class="positive">{{ currentData.firstRow.card3.monthOverMonth }}</span>
-              <span class="arrow-up"></span>
+              环比 <span :class="getStatClass(currentData.firstRow.card3.monthOverMonth)">{{ currentData.firstRow.card3.monthOverMonth }}</span>
+              <span :class="getArrowClass(currentData.firstRow.card3.monthOverMonth)"></span>
             </span>
           </div>
         </div>
@@ -103,12 +103,12 @@
           <div class="card-value">{{ currentData.secondRow.card1.value }}</div>
           <div class="card-stats">
             <span class="stat-item">
-              同比 <span class="positive">{{ currentData.secondRow.card1.yearOverYear }}</span>
-              <span class="arrow-up"></span>
+              同比 <span :class="getStatClass(currentData.secondRow.card1.yearOverYear)">{{ currentData.secondRow.card1.yearOverYear }}</span>
+              <span :class="getArrowClass(currentData.secondRow.card1.yearOverYear)"></span>
             </span>
             <span class="stat-item">
-              环比 <span class="positive">{{ currentData.secondRow.card1.monthOverMonth }}</span>
-              <span class="arrow-up"></span>
+              环比 <span :class="getStatClass(currentData.secondRow.card1.monthOverMonth)">{{ currentData.secondRow.card1.monthOverMonth }}</span>
+              <span :class="getArrowClass(currentData.secondRow.card1.monthOverMonth)"></span>
             </span>
           </div>
         </div>
@@ -121,12 +121,12 @@
           <div class="card-value">{{ currentData.secondRow.card2.value }}</div>
           <div class="card-stats">
             <span class="stat-item">
-              同比 <span class="positive">{{ currentData.secondRow.card2.yearOverYear }}</span>
-              <span class="arrow-up"></span>
+              同比 <span :class="getStatClass(currentData.secondRow.card2.yearOverYear)">{{ currentData.secondRow.card2.yearOverYear }}</span>
+              <span :class="getArrowClass(currentData.secondRow.card2.yearOverYear)"></span>
             </span>
             <span class="stat-item">
-              环比 <span class="positive">{{ currentData.secondRow.card2.monthOverMonth }}</span>
-              <span class="arrow-up"></span>
+              环比 <span :class="getStatClass(currentData.secondRow.card2.monthOverMonth)">{{ currentData.secondRow.card2.monthOverMonth }}</span>
+              <span :class="getArrowClass(currentData.secondRow.card2.monthOverMonth)"></span>
             </span>
           </div>
         </div>
@@ -139,12 +139,12 @@
           <div class="card-value">{{ currentData.secondRow.card3.value }}</div>
           <div class="card-stats">
             <span class="stat-item">
-              同比 <span class="positive">{{ currentData.secondRow.card3.yearOverYear }}</span>
-              <span class="arrow-up"></span>
+              同比 <span :class="getStatClass(currentData.secondRow.card3.yearOverYear)">{{ currentData.secondRow.card3.yearOverYear }}</span>
+              <span :class="getArrowClass(currentData.secondRow.card3.yearOverYear)"></span>
             </span>
             <span class="stat-item">
-              环比 <span class="positive">{{ currentData.secondRow.card3.monthOverMonth }}</span>
-              <span class="arrow-up"></span>
+              环比 <span :class="getStatClass(currentData.secondRow.card3.monthOverMonth)">{{ currentData.secondRow.card3.monthOverMonth }}</span>
+              <span :class="getArrowClass(currentData.secondRow.card3.monthOverMonth)"></span>
             </span>
           </div>
         </div>
@@ -156,77 +156,336 @@
 <script>
 export default {
   name: 'PowerLimitationOverview',
+  props: {
+    getAnnualRationingData: {
+      type: Array,
+      default: () => []
+    },
+    getMonthlyRationingData: {
+      type: Array,
+      default: () => []
+    }
+  },
   data() {
     return {
       activeTab: 'monthly',
       
-      // 各个标签对应的数据
-      tabData: {
-        monthly: {
-          firstRow: {
-            card1: { title: '公司限电量', value: '16.4', yearOverYear: '+7.66%', monthOverMonth: '+0.19%' },
-            card2: { title: '风电限电量', value: '11.97', yearOverYear: '+7.66%', monthOverMonth: '+0.19%' },
-            card3: { title: '光伏限电量', value: '4.51', yearOverYear: '+7.66%', monthOverMonth: '+0.19%' }
-          },
-          secondRow: {
-            card1: { title: '公司限电率', value: '15.17', yearOverYear: '+7.66%', monthOverMonth: '+0.19%' },
-            card2: { title: '风电限电率', value: '14.61', yearOverYear: '+7.66%', monthOverMonth: '+0.19%' },
-            card3: { title: '光伏限电率', value: '19.54', yearOverYear: '+7.66%', monthOverMonth: '+0.19%' }
-          }
+      // 默认数据结构
+      defaultData: {
+        firstRow: {
+          card1: { title: '公司限电量', value: '0', yearOverYear: '0%', monthOverMonth: '0%' },
+          card2: { title: '风电限电量', value: '0', yearOverYear: '0%', monthOverMonth: '0%' },
+          card3: { title: '光伏限电量', value: '0', yearOverYear: '0%', monthOverMonth: '0%' }
         },
-        yearly: {
-          firstRow: {
-            card1: { title: '公司限电量', value: '198.5', yearOverYear: '+12.3%', monthOverMonth: '+2.1%' },
-            card2: { title: '风电限电量', value: '145.8', yearOverYear: '+15.2%', monthOverMonth: '+1.8%' },
-            card3: { title: '光伏限电量', value: '52.7', yearOverYear: '+8.9%', monthOverMonth: '+2.5%' }
-          },
-          secondRow: {
-            card1: { title: '公司限电率', value: '18.23', yearOverYear: '+9.1%', monthOverMonth: '+1.2%' },
-            card2: { title: '风电限电率', value: '16.85', yearOverYear: '+11.4%', monthOverMonth: '+0.9%' },
-            card3: { title: '光伏限电率', value: '21.46', yearOverYear: '+6.7%', monthOverMonth: '+1.6%' }
-          }
-        },
-        windCompare: {
-          firstRow: {
-            card1: { title: '本月风电限电', value: '11.97', yearOverYear: '+7.66%', monthOverMonth: '+0.19%' },
-            card2: { title: '上月风电限电', value: '11.75', yearOverYear: '+5.2%', monthOverMonth: '-1.1%' },
-            card3: { title: '同期风电限电', value: '11.12', yearOverYear: '+2.8%', monthOverMonth: '+0.5%' }
-          },
-          secondRow: {
-            card1: { title: '本月限电率', value: '14.61', yearOverYear: '+7.66%', monthOverMonth: '+0.19%' },
-            card2: { title: '上月限电率', value: '14.35', yearOverYear: '+4.9%', monthOverMonth: '-0.8%' },
-            card3: { title: '同期限电率', value: '13.58', yearOverYear: '+1.9%', monthOverMonth: '+0.3%' }
-          }
-        },
-        solarCompare: {
-          firstRow: {
-            card1: { title: '本月光伏限电', value: '4.51', yearOverYear: '+7.66%', monthOverMonth: '+0.19%' },
-            card2: { title: '上月光伏限电', value: '4.32', yearOverYear: '+5.8%', monthOverMonth: '-0.9%' },
-            card3: { title: '同期光伏限电', value: '4.19', yearOverYear: '+3.2%', monthOverMonth: '+0.7%' }
-          },
-          secondRow: {
-            card1: { title: '本月限电率', value: '19.54', yearOverYear: '+7.66%', monthOverMonth: '+0.19%' },
-            card2: { title: '上月限电率', value: '18.92', yearOverYear: '+6.1%', monthOverMonth: '-1.3%' },
-            card3: { title: '同期限电率', value: '18.15', yearOverYear: '+4.2%', monthOverMonth: '+0.8%' }
-          }
+        secondRow: {
+          card1: { title: '公司限电率', value: '0', yearOverYear: '0%', monthOverMonth: '0%' },
+          card2: { title: '风电限电率', value: '0', yearOverYear: '0%', monthOverMonth: '0%' },
+          card3: { title: '光伏限电率', value: '0', yearOverYear: '0%', monthOverMonth: '0%' }
         }
       }
     }
   },
   
   computed: {
+    // 处理月度限电概览数据（使用getMonthlyRationingData）
+    monthlyData() {
+      console.log('Processing monthly data:', this.getMonthlyRationingData)
+      return this.processMonthlyData(this.getMonthlyRationingData)
+    },
+    
+    // 处理年累计限电概览数据（使用getAnnualRationingData）
+    yearlyData() {
+      console.log('Processing yearly data:', this.getAnnualRationingData)
+      return this.processAnnualData(this.getAnnualRationingData)
+    },
+    
+    // 处理风电限电对比数据（使用getMonthlyRationingData）
+    windCompareData() {
+      return this.processCompareData(this.getMonthlyRationingData, 'wind')
+    },
+    
+    // 处理光伏限电对比数据（使用getMonthlyRationingData）
+    solarCompareData() {
+      return this.processCompareData(this.getMonthlyRationingData, 'solar')
+    },
+    
     currentData() {
-      return this.tabData[this.activeTab]
+      switch (this.activeTab) {
+        case 'monthly':
+          return this.monthlyData
+        case 'yearly':
+          return this.yearlyData
+        case 'windCompare':
+          return this.windCompareData
+        case 'solarCompare':
+          return this.solarCompareData
+        default:
+          return this.defaultData
+      }
     }
   },
   
   methods: {
     switchTab(tabName) {
       this.activeTab = tabName
+    },
+    
+    // 处理月度数据（有four_category字段）
+    processMonthlyData(sourceData) {
+      if (!sourceData || !Array.isArray(sourceData) || sourceData.length === 0) {
+        return this.defaultData
+      }
+      
+      // 根据four_category字段创建数据映射
+      const dataMap = {}
+      sourceData.forEach(item => {
+        if (item && item.four_category) {
+          dataMap[item.four_category] = {
+            value: item.metric_name || '0',
+            yearOverYear: item.metric_value || '0%',
+            monthOverMonth: item.unit || '0%'
+          }
+        }
+      })
+      
+      console.log('Monthly data map:', dataMap)
+      
+      return {
+        firstRow: {
+          card1: {
+            title: '公司限电量',
+            value: dataMap['公司限电量']?.value || '0',
+            yearOverYear: dataMap['公司限电量']?.yearOverYear || '0%',
+            monthOverMonth: dataMap['公司限电量']?.monthOverMonth || '0%'
+          },
+          card2: {
+            title: '风电限电量',
+            value: dataMap['风电限电量']?.value || '0',
+            yearOverYear: dataMap['风电限电量']?.yearOverYear || '0%',
+            monthOverMonth: dataMap['风电限电量']?.monthOverMonth || '0%'
+          },
+          card3: {
+            title: '光伏限电量',
+            value: dataMap['光伏限电量']?.value || '0',
+            yearOverYear: dataMap['光伏限电量']?.yearOverYear || '0%',
+            monthOverMonth: dataMap['光伏限电量']?.monthOverMonth || '0%'
+          }
+        },
+        secondRow: {
+          card1: {
+            title: '公司限电率',
+            value: dataMap['公司限电率']?.value || '0',
+            yearOverYear: dataMap['公司限电率']?.yearOverYear || '0%',
+            monthOverMonth: dataMap['公司限电率']?.monthOverMonth || '0%'
+          },
+          card2: {
+            title: '风电限电率',
+            value: dataMap['风电限电率']?.value || '0',
+            yearOverYear: dataMap['风电限电率']?.yearOverYear || '0%',
+            monthOverMonth: dataMap['风电限电率']?.monthOverMonth || '0%'
+          },
+          card3: {
+            title: '光伏限电率',
+            value: dataMap['光伏限电率']?.value || '0',
+            yearOverYear: dataMap['光伏限电率']?.yearOverYear || '0%',
+            monthOverMonth: dataMap['光伏限电率']?.monthOverMonth || '0%'
+          }
+        }
+      }
+    },
+    
+    // 处理年度数据（metric_name是标题）
+    processAnnualData(sourceData) {
+      if (!sourceData || !Array.isArray(sourceData) || sourceData.length === 0) {
+        return this.defaultData
+      }
+      
+      // 根据metric_name字段创建数据映射
+      const dataMap = {}
+      sourceData.forEach(item => {
+        if (item && item.metric_name) {
+          dataMap[item.metric_name] = {
+            value: item.metric_value || '0',
+            yearOverYear: item.unit || '0%', // 年度数据中unit作为同比
+            monthOverMonth: '0%' // 年度数据没有环比
+          }
+        }
+      })
+      
+      console.log('Annual data map:', dataMap)
+      
+      return {
+        firstRow: {
+          card1: {
+            title: '公司限电量',
+            value: dataMap['公司限电量']?.value || '0',
+            yearOverYear: dataMap['公司限电量']?.yearOverYear || '0%',
+            monthOverMonth: dataMap['公司限电量']?.monthOverMonth || '0%'
+          },
+          card2: {
+            title: '风电限电量',
+            value: dataMap['风电限电量']?.value || '0',
+            yearOverYear: dataMap['风电限电量']?.yearOverYear || '0%',
+            monthOverMonth: dataMap['风电限电量']?.monthOverMonth || '0%'
+          },
+          card3: {
+            title: '光伏限电量',
+            value: dataMap['光伏限电量']?.value || '0',
+            yearOverYear: dataMap['光伏限电量']?.yearOverYear || '0%',
+            monthOverMonth: dataMap['光伏限电量']?.monthOverMonth || '0%'
+          }
+        },
+        secondRow: {
+          card1: {
+            title: '公司限电率',
+            value: dataMap['公司限电率']?.value || '0',
+            yearOverYear: dataMap['公司限电率']?.yearOverYear || '0%',
+            monthOverMonth: dataMap['公司限电率']?.monthOverMonth || '0%'
+          },
+          card2: {
+            title: '风电限电率',
+            value: dataMap['风电限电率']?.value || '0',
+            yearOverYear: dataMap['风电限电率']?.yearOverYear || '0%',
+            monthOverMonth: dataMap['风电限电率']?.monthOverMonth || '0%'
+          },
+          card3: {
+            title: '光伏限电率',
+            value: dataMap['光伏限电率']?.value || '0',
+            yearOverYear: dataMap['光伏限电率']?.yearOverYear || '0%',
+            monthOverMonth: dataMap['光伏限电率']?.monthOverMonth || '0%'
+          }
+        }
+      }
+    },
+    
+    // 处理对比数据（风电/光伏对比）
+    processCompareData(sourceData, type) {
+      if (!sourceData || !Array.isArray(sourceData) || sourceData.length === 0) {
+        return this.defaultData
+      }
+      
+      // 根据four_category字段创建数据映射
+      const dataMap = {}
+      sourceData.forEach(item => {
+        if (item && item.four_category) {
+          dataMap[item.four_category] = {
+            value: item.metric_name || '0',
+            yearOverYear: item.metric_value || '0%',
+            monthOverMonth: item.unit || '0%'
+          }
+        }
+      })
+      
+      if (type === 'wind') {
+        return {
+          firstRow: {
+            card1: {
+              title: '本月风电限电',
+              value: dataMap['风电限电量']?.value || '0',
+              yearOverYear: dataMap['风电限电量']?.yearOverYear || '0%',
+              monthOverMonth: dataMap['风电限电量']?.monthOverMonth || '0%'
+            },
+            card2: {
+              title: '上月风电限电',
+              value: dataMap['上月风电限电']?.value || '0',
+              yearOverYear: dataMap['上月风电限电']?.yearOverYear || '0%',
+              monthOverMonth: dataMap['上月风电限电']?.monthOverMonth || '0%'
+            },
+            card3: {
+              title: '同期风电限电',
+              value: dataMap['同期风电限电']?.value || '0',
+              yearOverYear: dataMap['同期风电限电']?.yearOverYear || '0%',
+              monthOverMonth: dataMap['同期风电限电']?.monthOverMonth || '0%'
+            }
+          },
+          secondRow: {
+            card1: {
+              title: '本月限电率',
+              value: dataMap['风电限电率']?.value || '0',
+              yearOverYear: dataMap['风电限电率']?.yearOverYear || '0%',
+              monthOverMonth: dataMap['风电限电率']?.monthOverMonth || '0%'
+            },
+            card2: {
+              title: '上月限电率',
+              value: dataMap['上月风电限电率']?.value || '0',
+              yearOverYear: dataMap['上月风电限电率']?.yearOverYear || '0%',
+              monthOverMonth: dataMap['上月风电限电率']?.monthOverMonth || '0%'
+            },
+            card3: {
+              title: '同期限电率',
+              value: dataMap['同期风电限电率']?.value || '0',
+              yearOverYear: dataMap['同期风电限电率']?.yearOverYear || '0%',
+              monthOverMonth: dataMap['同期风电限电率']?.monthOverMonth || '0%'
+            }
+          }
+        }
+      } else if (type === 'solar') {
+        return {
+          firstRow: {
+            card1: {
+              title: '本月光伏限电',
+              value: dataMap['光伏限电量']?.value || '0',
+              yearOverYear: dataMap['光伏限电量']?.yearOverYear || '0%',
+              monthOverMonth: dataMap['光伏限电量']?.monthOverMonth || '0%'
+            },
+            card2: {
+              title: '上月光伏限电',
+              value: dataMap['上月光伏限电']?.value || '0',
+              yearOverYear: dataMap['上月光伏限电']?.yearOverYear || '0%',
+              monthOverMonth: dataMap['上月光伏限电']?.monthOverMonth || '0%'
+            },
+            card3: {
+              title: '同期光伏限电',
+              value: dataMap['同期光伏限电']?.value || '0',
+              yearOverYear: dataMap['同期光伏限电']?.yearOverYear || '0%',
+              monthOverMonth: dataMap['同期光伏限电']?.monthOverMonth || '0%'
+            }
+          },
+          secondRow: {
+            card1: {
+              title: '本月限电率',
+              value: dataMap['光伏限电率']?.value || '0',
+              yearOverYear: dataMap['光伏限电率']?.yearOverYear || '0%',
+              monthOverMonth: dataMap['光伏限电率']?.monthOverMonth || '0%'
+            },
+            card2: {
+              title: '上月限电率',
+              value: dataMap['上月光伏限电率']?.value || '0',
+              yearOverYear: dataMap['上月光伏限电率']?.yearOverYear || '0%',
+              monthOverMonth: dataMap['上月光伏限电率']?.monthOverMonth || '0%'
+            },
+            card3: {
+              title: '同期限电率',
+              value: dataMap['同期光伏限电率']?.value || '0',
+              yearOverYear: dataMap['同期光伏限电率']?.yearOverYear || '0%',
+              monthOverMonth: dataMap['同期光伏限电率']?.monthOverMonth || '0%'
+            }
+          }
+        }
+      }
+      
+      return this.defaultData
+    },
+    
+    // 根据数值判断样式类
+    getStatClass(value) {
+      if (value && value.includes('-')) {
+        return 'negative'
+      }
+      return 'positive'
+    },
+    
+    // 根据数值判断箭头方向
+    getArrowClass(value) {
+      if (value && value.includes('-')) {
+        return 'arrow-down'
+      }
+      return 'arrow-up'
     }
   }
 }
 </script>
+
 
 <style lang="scss" scoped>
 .power-limitation-overview {
@@ -352,7 +611,7 @@ export default {
   .card-value {
     font-size: 42px;
     font-weight: bold;
-    color: #00ccff;
+    color: #27FFFF;
     margin-bottom: 15px;
     text-shadow: 0 0 10px rgba(0, 204, 255, 0.3);
     font-family: 'Arial', monospace;
@@ -387,8 +646,17 @@ export default {
 		position:relative;
 		bottom:2px;
       }
+      
+      .arrow-down {
+		background: url("../../assets/images/homepage/Frame 427321111.png") center center no-repeat;
+		width:26px;
+		height:26px;
+		margin-left:16px;
+		position:relative;
+		bottom:2px;
+		transform: rotate(180deg);
+      }
     }
   }
 }
-
 </style>

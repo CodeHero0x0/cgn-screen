@@ -6,7 +6,7 @@
                 <span class="classification-percentage">百分比</span>
                 <span class="classification-hour" @mouseenter="highlightLine" @mouseleave="unhighlightLine">{{ lineName }}</span>
             </div>
-            <div class="classification-div3"><i>存量小时数对标: </i> <span> +10.07%</span></div>
+            <div class="classification-div3"><i>存量小时数对标: </i> <span> {{ description }}</span></div>
         </div>
 		<div ref="chart" class="mainbar"></div>
 	</div>
@@ -21,26 +21,34 @@ export default {
 		echartsData: { // 接收父组件数据
 			type: Array,
 			required: true
-		},
-		hourData: { // 接收小时数据（用于折线图）
-			type: Array,
-			required: true
 		}
 	},
 	data() {
 	  return {
-		total: 100, // 示例总值，可以根据实际情况计算
 		lineName: '小时数', // 初始化
-		myChart: null // 存储绘制的图表
+		myChart: null, // 存储绘制的图表
+		description:'',
 	  };
+	},
+	created() {
+		
 	},
 	mounted() {
 	  this.renderBar(); // 在组件挂载后渲染图表
 	},
+	watch: {
+		echartsData: {
+			handler() {
+				this.description = this.echartsData[0].description;
+				this.renderBar();
+			},
+			deep: true
+		}
+	},
 	methods: {
 	  // 根据颜色数组设置渐变色
 	  calcColor(value) {
-		if (value < 70) {
+		if (value < 3) {
 		  return {
 			type: 'linear',
 			x: 0, x2: 1, y: 0, y2: 0,
@@ -52,7 +60,7 @@ export default {
 			]
 		  };
 		}
-		if (value < 80) {
+		if (value < 4) {
 		  return {
 			type: 'linear',
 			x: 0, x2: 0.9, y: 0, y2: 0,
@@ -74,24 +82,34 @@ export default {
 		};
 	  },
 	  getSymbolColor(value) {
-		if (value < 70) {
-		  return '#D74647'; // 小于 70 为红色
-		} else if (value < 80) {
-		  return '#FFBB93'; // 小于 80 为黄色
+		if (value < 3) {
+		  return '#D74647'; // 小于 3% 为红色
+		} else if (value < 4) {
+		  return '#FFBB93'; // 小于 4% 为黄色
 		} else {
-		  return '#13FFE3'; // 大于等于 80 为青色
+		  return '#13FFE3'; // 大于等于 4% 为青色
 		}
 	  },
 	  renderBar() {
+		if (!this.echartsData || this.echartsData.length === 0) {
+			return;
+		}
+
 		const chartDom = this.$refs.chart; // 使用 ref 获取 DOM 元素
 		this.myChart = echarts.init(chartDom);
-  
-		// 计算百分比数据
-		const percentageData = this.echartsData.map(v => (v / this.total) * 100);
+
+		// 从 echartsData 提取数据
+		const stationNames = this.echartsData.map(item => item.metric_name);
+		const percentageData = this.echartsData.map(item => {
+			// 将 metric_value 的百分比字符串转换为数字
+			return parseFloat(item.metric_value.replace('%', ''));
+		});
+		const hourData = this.echartsData.map(item => parseFloat(item.unit));
+
 		const option = {
 			xAxis: {
                 type: 'category',
-                data: ['场站1', '场站2', '场站3', '场站4', '场站5', '场站6', '场站7', '场站8', '场站9', '场站10', '场站11', '场站12'],
+                data: stationNames,
                 axisLine: {
                     lineStyle: {
                         color: '#2d5a87',
@@ -110,7 +128,12 @@ export default {
                     color: '#FFFFFFCC',
                     fontSize: 26,
                     margin: 30,
-                    interval: 0 // 强制显示所有标签
+                    interval: 0, // 强制显示所有标签
+                    rotate: 0, // 改为0度，不旋转
+                    formatter: function (value) {
+                        // 如果标签超过3个字符，显示省略号
+                        return value.length > 3 ? value.substr(0, 3) + '...' : value;
+                    }
                 }
             },
 
@@ -126,7 +149,7 @@ export default {
 					},
 					axisLabel: {
 						fontSize: 26,
-						formatter: '{value} ',
+						formatter: '{value}%',
 						color: '#2CD7FF',
 					},
 					splitLine: {
@@ -162,7 +185,7 @@ export default {
 				left: '10',
 				right: '20',
 				top: '50',
-				bottom: '40',
+				bottom: '80', // 调整底部空间
 				containLabel: true
 			},
 			legend: {
@@ -173,6 +196,22 @@ export default {
 					fontSize: 26
 				}
 			},
+			// 添加 dataZoom 组件支持拖动
+			dataZoom: [
+				{
+					type: 'slider',
+					show: false, // 隐藏滑块
+					xAxisIndex: 0,
+					filterMode: 'none',
+					start: 0,
+					end: this.echartsData.length > 12 ? (12 / this.echartsData.length) * 100 : 100 // 默认显示12个数据点
+				},
+				{
+					type: 'inside', // 支持鼠标拖拽
+					xAxisIndex: 0,
+					filterMode: 'none'
+				}
+			],
 			series: [
 				{
 					type: 'bar',
@@ -214,10 +253,9 @@ export default {
 					symbolOffset: ['0', '-50%'],
 					symbolSize: [31, 31 * 0.4]
 				},
-
 				{
                     type: 'line',
-                    data: this.hourData,
+                    data: hourData,
                     lineStyle: {
                         color: '#FFCC00', // 折线颜色
                         width: 3, // 折线宽度
@@ -243,20 +281,43 @@ export default {
                         itemStyle: {
                             color: '#FFD700' // 内部点的颜色为黄色
                         },
-                        data: this.hourData.map((v, index) => ({type: 'max', name: '黄色点', coord: [index, v]})) // 可以根据需要动态添加
+                        data: hourData.map((v, index) => ({type: 'max', name: '黄色点', coord: [index, v]})) // 可以根据需要动态添加
                     },
                     yAxisIndex: 1 // 使用右侧 Y 轴
                 }
-			]
+			],
+			// 添加工具提示
+			tooltip: {
+				trigger: 'axis',
+				axisPointer: {
+					type: 'shadow'
+				},
+				formatter: function(params) {
+					let result = params[0].name + '<br/>';
+					params.forEach(function(item) {
+						if (item.seriesIndex === 0) { // 柱状图
+							result += item.marker + '百分比: ' + item.value + '%<br/>';
+						} else if (item.seriesIndex === 3) { // 折线图
+							result += item.marker + '小时数: ' + item.value + 'h<br/>';
+						}
+					});
+					return result;
+				}
+			}
 		};
   
-		this.myChart.setOption(option);
+		this.myChart.setOption(option, true); // 第二个参数为true表示不合并，完全替换
   
 		// 确保图表在窗口大小改变时能够自适应
-		window.addEventListener('resize', () => this.myChart.resize());
+		window.addEventListener('resize', () => {
+			if (this.myChart) {
+				this.myChart.resize();
+			}
+		});
 	  },
 	  highlightLine() {
-		const dataLength = this.hourData.length; // 数据点数量
+		if (!this.myChart || !this.echartsData) return;
+		const dataLength = this.echartsData.length; // 数据点数量
 		for (let i = 0; i < dataLength; i++) {
 			this.myChart.dispatchAction({
 				type: 'highlight',
@@ -266,7 +327,8 @@ export default {
 		}
 	  },
 	  unhighlightLine() {
-		const dataLength = this.hourData.length; // 数据点数量
+		if (!this.myChart || !this.echartsData) return;
+		const dataLength = this.echartsData.length; // 数据点数量
 		for (let i = 0; i < dataLength; i++) {
 			this.myChart.dispatchAction({
 				type: 'downplay',
@@ -275,6 +337,13 @@ export default {
 			});
 		}
 	  }
+	},
+	beforeDestroy() {
+		// 组件销毁前清理
+		if (this.myChart) {
+			this.myChart.dispose();
+		}
+		window.removeEventListener('resize', this.myChart?.resize);
 	}
 }
 </script>

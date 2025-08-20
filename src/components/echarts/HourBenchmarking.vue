@@ -29,22 +29,14 @@ import * as echarts from 'echarts'; // 导入 echarts
 import huangse from '../../assets/images/homepage/huangse.png';
 import chengse from '../../assets/images/homepage/chengse.png';
 import lanse from '../../assets/images/homepage/lanse.png';
+
 export default {
 	name: 'MainBarChart',
 	props: {
         yearbefore: {
             type: Array,
-            required: true
-        },
-        lastyear: {
-            type: Array,
-            required: false, // 改为 false
-            default: () => [] // 提供默认值
-        },
-        thisyear: {
-            type: Array,
-            required: false, // 改为 false
-            default: () => [] // 提供默认值
+            required: true,
+            default: () => []
         }
     },
 	data() {
@@ -57,133 +49,162 @@ export default {
 	mounted() {
 	  this.renderBar(); 
 	},
+    watch: {
+        yearbefore: {
+            handler() {
+                this.renderBar();
+            },
+            deep: true
+        }
+    },
 	methods: {
-      renderBar() {
-        const chartDom = this.$refs.chart; 
-        this.myChart = echarts.init(chartDom);
-        console.log(123,this.yearbefore)
-        const percentageData = this.yearbefore.map(v => (v / this.total) * 100);
+        renderBar() {
+            const chartDom = this.$refs.chart; 
+            this.myChart = echarts.init(chartDom);
+            
+            console.log(123, this.yearbefore);
+            
+            // 从新的数据结构中提取数据
+            const categories = this.yearbefore.map(item => item.four_category);
+            
+            // 提取2023年数据 (metric_name)
+            const year2023Data = this.yearbefore.map(item => {
+                const value = parseFloat(item.metric_name.replace('%', ''));
+                return isNaN(value) ? 0 : value;
+            });
+            
+            // 提取2024年数据 (metric_value)
+            const year2024Data = this.yearbefore.map(item => {
+                const value = parseFloat(item.metric_value.replace('%', ''));
+                return isNaN(value) ? 0 : value;
+            });
+            
+            // 提取2025年数据 (unit)
+            const year2025Data = this.yearbefore.map(item => {
+                if (!item.unit || item.unit === '') return null; // 空值返回null，在图表中不显示
+                const value = parseFloat(item.unit.replace('%', ''));
+                return isNaN(value) ? null : value;
+            });
+            
+            const option = {
+                xAxis: {
+                    type: 'category',
+                    data: categories, // 使用从数据中提取的月份
+                    axisLine: {
+                        lineStyle: {
+                            color: '#2d5a87',
+                            width: 2,
+                            type: 'dashed'
+                        }
+                    },
+                    axisTick: {
+                        show: true,
+                        lineStyle: {
+                            color: '#2d5a87',
+                            type: 'dashed'
+                        }
+                    },
+                    axisLabel: {
+                        color: '#FFFFFFCC',
+                        fontSize: 26,
+                        margin: 30,
+                        interval: 0
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLine: {
+                        lineStyle: {
+                            color: '#2d5a87',
+                            width: 2,
+                            type: 'dashed'
+                        }
+                    },
+                    axisLabel: {
+                        fontSize: 26,
+                        formatter: '{value}%',
+                        color: '#2CD7FF',
+                    },
+                    splitLine: {
+                        lineStyle: {
+                            type: 'dashed',
+                            color: '#2d5a87'
+                        }
+                    }
+                },
+                grid: {
+                    left: '10',
+                    right: '20',
+                    top: '50',
+                    bottom: '40',
+                    containLabel: true
+                },
+                legend: {
+                    top: 0,
+                    right: 10,
+                    textStyle: {
+                        color: '#ffffff',
+                        fontSize: 26
+                    }
+                },
+                series: [
+                    {
+                        type: 'line',
+                        data: year2023Data,
+                        lineStyle: {
+                            color: '#FFB10B', // 2023年颜色 (对应huangse)
+                            width: 3,
+                        },
+                        symbol: `image://${huangse}`,
+                        symbolSize: [28, 28]
+                    },
+                    {
+                        type: 'line',
+                        data: year2024Data,
+                        lineStyle: {
+                            color: '#FF710B', // 2024年颜色 (对应chengse)
+                            width: 3,
+                        },
+                        symbol: `image://${chengse}`,
+                        symbolSize: [28, 28]
+                    },
+                    {
+                        type: 'line',
+                        data: year2025Data,
+                        lineStyle: {
+                            color: '#00C2FF', // 2025年颜色 (对应lanse)
+                            width: 3,
+                            type: 'solid'
+                        },
+                        symbol: `image://${lanse}`,
+                        symbolSize: [28, 28],
+                        connectNulls: false // 不连接空值点
+                    }
+                ]
+            };
+
+            this.myChart.setOption(option);
+
+            window.addEventListener('resize', () => this.myChart.resize());
+        },
+
+        highlightLine(index) {
+            if (this.myChart) {
+                this.myChart.dispatchAction({
+                    type: 'highlight',
+                    seriesIndex: index, // 折线图的索引
+                });
+            }
+        },
         
-        const lastYearData = this.lastyear.map(v => (v / this.total) * 100);
-        const thisYearData = this.thisyear.map(v => (v / this.total) * 100);
-        
-        const option = {
-            xAxis: {
-                type: 'category',
-                data: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
-                axisLine: {
-                    lineStyle: {
-                        color: '#2d5a87',
-                        width: 2,
-                        type: 'dashed'
-                    }
-                },
-                axisTick: {
-                    show: true,
-                    lineStyle: {
-                        color: '#2d5a87',
-                        type: 'dashed'
-                    }
-                },
-                axisLabel: {
-                    color: '#FFFFFFCC',
-                    fontSize: 26,
-                    margin: 30,
-                    interval: 0
-                }
-            },
-            yAxis: {
-                type: 'value',
-                axisLine: {
-                    lineStyle: {
-                        color: '#2d5a87',
-                        width: 2,
-                        type: 'dashed'
-                    }
-                },
-                axisLabel: {
-                    fontSize: 26,
-                    formatter: '{value} ',
-                    color: '#2CD7FF',
-                },
-                splitLine: {
-                    lineStyle: {
-                        type: 'dashed',
-                        color: '#2d5a87'
-                    }
-                }
-            },
-            grid: {
-                left: '10',
-                right: '20',
-                top: '50',
-                bottom: '40',
-                containLabel: true
-            },
-            legend: {
-                top: 0,
-                right: 10,
-                textStyle: {
-                    color: '#ffffff',
-                    fontSize: 26
-                }
-            },
-            series: [
-                {
-                    type: 'line',
-                    data: thisYearData,
-                    lineStyle: {
-                        color: '#00C2FF',
-                        width: 3,
-                        type: 'solid'
-                    },
-                    symbol: `image://${lanse}`,
-                    symbolSize: [28, 28]
-                },
-                {
-                    type: 'line',
-                    data: lastYearData,
-                    lineStyle: {
-                        color: '#FF710B', // 去年颜色
-                        width: 3,
-                    },
-                    symbol: 'circle', 
-                    symbolSize: [28, 28], 
-                    symbol: `image://${chengse}`,
-                    symbolSize: [28, 28]
-                },
-                {
-                    type: 'line',
-                    data: percentageData,
-                    lineStyle: {
-                        color: '#FFB10B', // 前年颜色
-                        width: 3,
-                    },
-                    symbol: 'circle', 
-                    symbolSize: [28, 28], 
-                    symbol: `image://${huangse}`,
-                    symbolSize: [28, 28]
-                }
-            ]
-        };
-
-        this.myChart.setOption(option);
-
-        window.addEventListener('resize', () => this.myChart.resize());
-    },
-
-    highlightLine(index) {
-        this.myChart.dispatchAction({
-            type: 'highlight',
-            seriesIndex: index, // 折线图的索引
-        });
-    },
-    unhighlightLine(index) {
-        this.myChart.dispatchAction({
-            type: 'downplay',
-            seriesIndex: index, // 折线图的索引
-        });
-    }
+        unhighlightLine(index) {
+            if (this.myChart) {
+                this.myChart.dispatchAction({
+                    type: 'downplay',
+                    seriesIndex: index, // 折线图的索引
+                });
+            }
+        }
 	}
 }
 </script>

@@ -15,20 +15,20 @@
                             <div class="state">
 								<h2></h2>
 								<div>
-									<p v-for="value in statedata">
-										<span class="state-span1">{{ value.name }}</span>
+									<p v-for="value in getEquipmentStatusData">
+										<span class="state-span1">{{ value.four_category }}</span>
 										<span class="state-span2"></span>
 										<span class="state-span3">
 											<i style="color: rgba(255, 255, 255, 0.60);opacity: 0.8;">正常</i>
-											<i style="color: #00F2FF;">{{ value.speed }}</i>
+											<i style="color: #00F2FF;"> {{ value.metric_name }}</i>
 										</span>
 										<span class="state-span4">
 											<i style="color: rgba(255, 255, 255, 0.60);opacity: 0.8;">异常</i>
-											<i style="color: #FF990B;">{{ value.abnormal }}</i>
+											<i style="color: #FF990B;"> {{ value.metric_value }}</i>
 										</span>
 										<span class="state-span5">
 											<i style="color: rgba(255, 255, 255, 0.60);opacity: 0.8;">维护</i>
-											<i style="color: #FEFF30;">{{ value.maintenance }}</i>
+											<i style="color: #FEFF30;"> {{ value.unit }}</i>
 										</span>
 									</p>
 								</div>
@@ -50,10 +50,10 @@
                             <div class="statistical">
 								<h2></h2>
 								<div>
-									<p v-for="value in statisticaldata">
-										<span class="statistical-span1">{{ value.name }} : </span>
-										<span style="color: #fff;">{{ value.quantity }}</span>
-										条
+									<p v-for="value in getWarningStatisticsData">
+										<span class="statistical-span1">{{ value.metric_name }} : </span>
+										<span style="color: #fff;">{{ value.metric_value }}</span>
+										{{ value.unit }}
 									</p>
 								</div>
 							</div>
@@ -66,12 +66,10 @@
                     <div class="PowerGeneration-right">
                        <div class="monitor">
                             <div class="grid-item-div2">
-								<div class="grid-item-div2-div1" v-for="item in monitor">
+								<div class="grid-item-div2-div1" v-for="item in getMonitoringData">
 									<p>
 										<img :src="item.img"/>
-										
 										<span>{{ item.name }}</span>
-												
 									</p>
 									<p v-if="item.id == 1 || item.id == 3 || item.id == 4">
 										<span>正常: <i style="color: #00F2FF;"> {{ item.normal }}</i></span>
@@ -130,7 +128,7 @@
 					<button>设备管控</button>
 				</div>
 			</div>
-			<div class="conRight">
+			<!-- <div class="conRight">
 				<div class="Intelligent-patrol">
 					<h2></h2>
 					<div class="Inspection-statistics">
@@ -376,7 +374,7 @@
 						</div>
 					</div>
 				</div>
-			</div>
+			</div> -->
         </div>
     </div>
 </template>
@@ -426,17 +424,6 @@ export default {
 				{'name':'源网荷储','year':'63639','month':'67690','daily':'94.02%',"YoY":'','MoM':''},
 			],
 			StackedBarChartData1:{'name': '场外受累','all':'月度','wind':'年累计','solar':'计划','IconCurve':'完成','unitOfMeasurement':'未完成'},
-			monitor: [
-				{ id: 1, name: '升压站设备', quantity: 54 ,fault:0,Warning:0,img:'../../../src/assets/images/equipmentManagement/shengyazhan.png'},
-				{ id: 2, name: '风电设备', normal: 1295 ,fault:0,Warning:0,img:'../../../src/assets/images/equipmentManagement/fengdianshebei.png'},
-				{ id: 3, name: '光伏设备',  normal: 4026 ,fault:0,Warning:0,img:'../../../src/assets/images/equipmentManagement/guangfushebei.png'},
-				{ id: 4, name: '储能设备',  normal: 4026 ,fault:0,Warning:0,img:'../../../src/assets/images/equipmentManagement/chunengshebei.png'},
-				{ id: 5, name: '能量管理',  normal: 0 ,fault:0,img:'../../../src/assets/images/equipmentManagement/nengliangguanli.png'},
-				{ id: 6, name: '功率预测',  normal: 40 ,fault:0,img:'../../../src/assets/images/equipmentManagement/gonglvyuce.png'},
-				{ id: 7, name: '电能计量',  normal: 1180 ,fault:0,Warning:0,img:'../../../src/assets/images/equipmentManagement/diannengjiliang.png'},
-				{ id: 8, name: '保信录波',  normal: 114 ,fault:0,img:'../../../src/assets/images/equipmentManagement/baoxinlubo.png'},
-				{ id: 9, name: '火灾报警',  normal: 40 ,fault:0,Warning:0,img:'../../../src/assets/images/equipmentManagement/huozaibaojing.png'},
-			],
 			statedata: [
             	{ id: 1, name: '风电机组', speed: 6.75 ,abnormal:5,maintenance:57},
 				{ id: 2, name: '风电机组', speed: 6.75 ,abnormal:5,maintenance:57},
@@ -610,12 +597,50 @@ export default {
 				1: { text: '问题某一明', color: '#ff4757' },
 				2: { text: '问题某一明', color: '#ffa726' },
 				3: { text: '问题某一明', color: '#2ed573' },
-			}
+			},
+			//设备管控/智慧监控
+			getWarningDetailsData:[],
+			getMonitoringData:[],
+			getEarlyWarningAnalysisData:[],
+			getWarningStatisticsData:[],
+			getAlarmPromptData:[],
+			getRealTimeOutputData:[],
+			getEquipmentStatusData:[],
+			//设备管控/智能巡视
+			getUavStationData:[],
+			getDroneInspectionData:[],
+			getUnmannedAerialVehicleData:[],
+			getAlarmStatisticsData:[],
+			getReliabilityIndexData:[],
+			getInspectionStatisticsData:[],
+			getOperationTicketData:[],
+			getWorkTicketData:[],
+			getWorkOrderListData:[],
+			getMaintenanceTasksData:[],
+			getPersonnelAndVehiclesData:[],
 		}
 	},
 	created() {
 	},
   	mounted() {
+		this.getWarningDetails();
+		this.getMonitoring();
+		this.getEarlyWarningAnalysis();
+		this.getWarningStatistics();
+		this.getAlarmPrompt();
+		this.getRealTimeOutput();
+		this.getEquipmentStatus();
+		this.getUavStation();
+		this.getDroneInspection();
+		this.getUnmannedAerialVehicle();
+		this.getAlarmStatistics();
+		this.getReliabilityIndex();
+		this.getInspectionStatistics();
+		this.getOperationTicket();
+		this.getWorkTicket();
+		this.getWorkOrderList();
+		this.getMaintenanceTasks();
+		this.getPersonnelAndVehicles();
 	},
 	beforeDestroy(){
 	},
@@ -626,12 +651,232 @@ export default {
 
 	},
 	methods: {
-		...mapMutations("home", [
-		"SET_PROVINCEID",
-		"SET_SITETYPE",
-		"SET_FJ_TYPE",
-		"SET_REGIONBGFLAG"
-		]),
+		getWarningDetails() {
+			this.$http.sx.getWarningDetails({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getWarningDetailsData = res.data.rowData;
+				}
+				
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getMonitoring() {
+			this.$http.sx.getMonitoring({
+			}).then(res => {
+				if (res.code === 0) {
+					res.data.rowData.map((i)=>{
+						if(i.four_category == '升压站设备'){
+							this.getMonitoringData.push({ id: 1, name: i.four_category, normal:i.metric_name, quantity: i.metric_name ,fault:i.metric_value,Warning:i.unit,img:'../../../src/assets/images/equipmentManagement/shengyazhan.png'})
+						}
+						if(i.four_category == '风电设备'){
+							this.getMonitoringData.push({ id: 2, name: i.four_category, normal:i.metric_name, quantity: i.metric_name ,fault:i.metric_value,Warning:i.unit,img:'../../../src/assets/images/equipmentManagement/fengdianshebei.png'})
+						}
+						if(i.four_category == '光伏设备'){
+							this.getMonitoringData.push({ id: 3, name: i.four_category, normal:i.metric_name, quantity: i.metric_name ,fault:i.metric_value,Warning:i.unit,img:'../../../src/assets/images/equipmentManagement/guangfushebei.png'})
+						}
+						if(i.four_category == '储能设备'){
+							this.getMonitoringData.push({ id: 4, name: i.four_category, normal:i.metric_name, quantity: i.metric_name ,fault:i.metric_value,Warning:i.unit,img:'../../../src/assets/images/equipmentManagement/chunengshebei.png'})
+						}
+						if(i.four_category == '能量管理'){
+							this.getMonitoringData.push({ id: 5, name: i.four_category, normal:i.metric_name, quantity: i.metric_name ,fault:i.metric_value,Warning:i.unit,img:'../../../src/assets/images/equipmentManagement/nengliangguanli.png'})
+						}
+						if(i.four_category == '功率预测'){
+							this.getMonitoringData.push({ id: 6, name: i.four_category, normal:i.metric_name, quantity: i.metric_name ,fault:i.metric_value,Warning:i.unit,img:'../../../src/assets/images/equipmentManagement/gonglvyuce.png'})
+						}
+						if(i.four_category == '电能计量'){
+							this.getMonitoringData.push({ id: 7, name: i.four_category, normal:i.metric_name, quantity: i.metric_name ,fault:i.metric_value,Warning:i.unit,img:'../../../src/assets/images/equipmentManagement/diannengjiliang.png'})
+						}
+						if(i.four_category == '保信录波'){
+							this.getMonitoringData.push({ id: 8, name: i.four_category, normal:i.metric_name, quantity: i.metric_name ,fault:i.metric_value,Warning:i.unit,img:'../../../src/assets/images/equipmentManagement/baoxinlubo.png'})
+						}
+						if(i.four_category == '火灾报警'){
+							this.getMonitoringData.push({ id: 9, name: i.four_category, normal:i.metric_name, quantity: i.metric_name ,fault:i.metric_value,Warning:i.unit,img:'../../../src/assets/images/equipmentManagement/huozaibaojing.png'})
+						}
+					})
+				}
+				
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getEarlyWarningAnalysis() {
+			this.$http.sx.getEarlyWarningAnalysis({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getEarlyWarningAnalysisData = res.data.rowData;
+				}
+				
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getWarningStatistics() {
+			this.$http.sx.getWarningStatistics({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getWarningStatisticsData = res.data.rowData;
+				}
+				
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getAlarmPrompt() {
+			this.$http.sx.getAlarmPrompt({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getAlarmPromptData = res.data.rowData;
+				}
+				
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getRealTimeOutput() {
+			this.$http.sx.getRealTimeOutput({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getRealTimeOutputData = res.data.rowData;
+				}
+				
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getEquipmentStatus() {
+			this.$http.sx.getEquipmentStatus({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getEquipmentStatusData = res.data.rowData;
+				}
+				
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getUavStation() {
+			this.$http.sx.getUavStation({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getUavStationData = res.data.rowData;
+				}
+				
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getDroneInspection() {
+			this.$http.sx.getDroneInspection({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getDroneInspectionData = res.data.rowData;
+				}
+				
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getUnmannedAerialVehicle() {
+			this.$http.sx.getUnmannedAerialVehicle({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getUnmannedAerialVehicleData = res.data.rowData;
+				}
+				
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getAlarmStatistics() {
+			this.$http.sx.getAlarmStatistics({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getAlarmStatisticsData = res.data.rowData;
+				}
+				
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getReliabilityIndex() {
+			this.$http.sx.getReliabilityIndex({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getReliabilityIndexData = res.data.rowData;
+				}
+				
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getInspectionStatistics() {
+			this.$http.sx.getInspectionStatistics({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getInspectionStatisticsData = res.data.rowData;
+				}
+				
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getOperationTicket() {
+			this.$http.sx.getOperationTicket({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getOperationTicketData = res.data.rowData;
+				}
+				
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getWorkTicket() {
+			this.$http.sx.getWorkTicket({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getWorkTicketData = res.data.rowData;
+				}
+				
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getWorkOrderList() {
+			this.$http.sx.getWorkOrderList({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getWorkOrderListData = res.data.rowData;
+				}
+				
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getMaintenanceTasks() {
+			this.$http.sx.getMaintenanceTasks({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getMaintenanceTasksData = res.data.rowData;
+				}
+				
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getPersonnelAndVehicles() {
+			this.$http.sx.getPersonnelAndVehicles({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getPersonnelAndVehiclesData = res.data.rowData;
+				}
+				
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
 	},
 }
 </script>
@@ -899,12 +1144,13 @@ export default {
 								line-height: 42px;
 								color: #AFAFAF;
 								cursor: pointer;
-								text-align: center;
+								text-align: left;
 								font-family: "Alibaba PuHuiTi 2.0";
 								font-size: 26px;
 								font-style: normal;
 								font-weight: 400;
 								background: url("../../../assets/images/CompanyOverview/Frame 1705.png") 0% center no-repeat;
+								padding-left: 40px;
 							}
 							.statistical-span1:hover{
 								color: #38BDFF;

@@ -51,50 +51,43 @@
 							</div>
 						</div>
 						<div class="ElectricityStatistics">
-							<div class="ElectricityStatistics_div" v-for="value in getPlannedPowerData">
+							<div class="ElectricityStatistics_div">
 								<div>
-									<p>{{value.metric_name}}:{{ value.metric_value }}</p>
-									<p>本月计划发电量:5206.36</p>
+									<p>年计划发电量:{{ getPlannedPowerData[0].four_category }}</p>
+									<p>本月计划发电量:{{ getPlannedPowerData[0].metric_value }}</p>
 								</div>						<div>
-									<p style="color:#999;">超发 <span>-49.42</span><i></i></p>
-									<p style="color:#999;">超发 <span>-49.42</span><i></i></p>
+									<p style="color:#999;">超发 <span>{{ getPlannedPowerData[0].metric_name }}</span><i></i></p>
+									<p style="color:#999;">超发 <span>{{ getPlannedPowerData[0].unit }}</span><i></i></p>
 								</div>
 							</div>
 							<div class="ElectricityStatistics_div">
 								<div>
-									<p>风电年计划发电量:91000</p>
-									<p>风电本月发电量:5206.36</p>
+									<p>风电年计划发电量:{{ getPlannedPowerData[1].four_category }}</p>
+									<p>风电本月发电量:{{ getPlannedPowerData[1].metric_value }}</p>
 								</div>
 								<div>
-									<p style="color:#999;">超发 <span>-49.42</span><i></i></p>
-									<p style="color:#999;">超发 <span>-49.42</span><i></i></p>
-								</div>
-							</div>
-							<div class="ElectricityStatistics_div">
-								<div>
-									<p>光伏年计划发电量:91000</p>
-									<p>光伏本月发电量:5206.36</p>
-								</div>
-								<div>
-									<p style="color:#999;">超发 <span>-49.42</span><i></i></p>
-									<p style="color:#999;">超发 <span>-49.42</span><i></i></p>
+									<p style="color:#999;">超发 <span>{{ getPlannedPowerData[1].metric_name }}</span><i></i></p>
+									<p style="color:#999;">超发 <span>{{ getPlannedPowerData[1].unit }}</span><i></i></p>
 								</div>
 							</div>
 							<div class="ElectricityStatistics_div">
 								<div>
-									<p>日风发电量:91000</p>
-									<p>日光发电量:5206.36</p>
+									<p>光伏年计划发电量:{{ getPlannedPowerData[2].four_category }}</p>
+									<p>光伏本月发电量:{{ getPlannedPowerData[2].metric_value }}</p>
 								</div>
 								<div>
-									<p style="color:#999;">超发 <span>-49.42</span><i></i></p>
-									<p style="color:#999;">超发 <span>-49.42</span><i></i></p>
+									<p style="color:#999;">超发 <span>{{ getPlannedPowerData[2].metric_name }}</span><i></i></p>
+									<p style="color:#999;">超发 <span>{{ getPlannedPowerData[2].unit }}</span><i></i></p>
 								</div>
 							</div>
 							<div class="ElectricityStatistics_div">
 								<div>
-									<p>年综合场用电率:2.21%</p>	
+									<p>日风发电量:{{ getPlannedPowerData[3].four_category }}</p>
+									<p>日光发电量:{{ getPlannedPowerData[3].metric_value }}</p>
 								</div>
 								<div>
+									<p style="color:#999;">超发 <span>{{ getPlannedPowerData[3].metric_name }}</span><i></i></p>
+									<p style="color:#999;">超发 <span>{{ getPlannedPowerData[3].unit }}</span><i></i></p>
 								</div>
 							</div>
 						</div>
@@ -117,11 +110,11 @@
 				</div>
 				<div class="ResourcesSituation">
 					<div class="resources">
-						<Resources :echartsData="echartsData"></Resources>
+						<Resources :echartsData="echartsData" :all="getWindMonthlyActualData" :windPower="getWindMonthlyForecastedData" :photovoltaic="getWindMonthlyAverageSpeedData"></Resources>
 						<div class="bottom"></div>
 					</div>
 					<div class="situation">
-						<Resources :echartsData="echartsData1"></Resources>
+						<Resources :echartsData="echartsData1" :all="getAllMonthlyPlannedData" :windPower="getWindMonthlyPlanedData" :photovoltaic="getWindMonthlyActualPowerData"></Resources>
 						<div class="bottom"></div>
 					</div>
 				</div>
@@ -146,37 +139,36 @@
 					<button>设备管控</button>
 				</div>
 			</div>
-			<!-- <div class="conRight">
+			<div class="conRight">
 				<div class="ResourcesSituation">
 					<div class="resources">
-						<LossPowerChart></LossPowerChart>
+						<LossPowerChart :getAffectedOnSiteData="getAffectedOnSiteData"></LossPowerChart>
 						<div class="bottom"></div>
 					</div>
 					<div class="situation">
-						<powerStatsContainer></powerStatsContainer>
+						<powerStatsContainer :getAnnualRationingData="getAnnualRationingData" :getMonthlyRationingData="getMonthlyRationingData"></powerStatsContainer>
 					</div>
 				</div>
 				<div class="StationStatistics">
 					<div class="resources">
-						<StackedBarChart :StackedBarChartData="StackedBarChartData"></StackedBarChart>
+						<StackedBarChart :StackedBarChartData="StackedBarChartData" :getMonthlyPowerTransmissionData="getMonthlyPowerTransmissionData" :getMonthlyGeneratorSetData="getMonthlyGeneratorSetData"></StackedBarChart>
 						<div class="bottom"></div>
 					</div>
 					<div class="situation">
-						<WaveChart :StackedBarChartData="StackedBarChartData3"></WaveChart>
+						<WaveChart :StackedBarChartData="StackedBarChartData3" :getAnnualAccumulationData="getAnnualAccumulationData" :getMonthlyRationingLossData="getMonthlyRationingLossData"></WaveChart>
 						<div class="bottom"></div>
 					</div>
 				</div>
 				<div class="ResourcesSituation">
 					<div class="resources">
-						<StackedBarChart1 :StackedBarChartData="StackedBarChartData2"></StackedBarChart1>
+						<StackedBarChart1 :StackedBarChartData="StackedBarChartData2" :getAnnualGeneratorSetData="getAnnualGeneratorSetData" :getScheduledMonthlyGeneratorSetData="getScheduledMonthlyGeneratorSetData"></StackedBarChart1>
 						<div class="bottom"></div>
 					</div>
 					<div class="situation">
-						<StackedBarChart :StackedBarChartData="StackedBarChartData1"></StackedBarChart>
-						<div class="bottom"></div>
+						<StackedBarChart :StackedBarChartData="StackedBarChartData" :getMonthlyPowerTransmissionData="getAnnualPowerGridData" :getMonthlyGeneratorSetData="getMonthlyPowerGridData"></StackedBarChart>
 					</div>
 				</div>
-			</div> -->
+			</div>
         </div>
     </div>
 </template>
@@ -235,16 +227,31 @@ export default {
 			//业务运营/发电量和资源
 			getWindMonthlyActualData:[],
 			getWindMonthlyForecastedData:[],
+			getWindMonthlyAverageSpeedData:[],
+			//业务运营/发电计划执行
+			getAllMonthlyPlannedData:[],
+			getWindMonthlyPlanedData:[],
+			getWindMonthlyActualPowerData:[],
 			//业务运营/损失电量
 			getAffectedOnSiteData:[],
 			//业务运营/限电分析
 			getAnnualRationingData:[],
 			getMonthlyRationingData:[],
+			//业务运营/场内受累
+			getMonthlyPowerTransmissionData:[],
+			getMonthlyGeneratorSetData:[],
+  			//业务运营/限电损失
+			getAnnualAccumulationData:[],
+			getMonthlyRationingLossData:[],
+			//业务运营/计划停运
+			getAnnualGeneratorSetData:[],
+			getScheduledMonthlyGeneratorSetData:[],
+			//业务运营/场外受累
+			getAnnualPowerGridData:[],
+			getMonthlyPowerGridData:[],
 		}
 	},
 	created() {
-	},
-  	mounted() {
 		this.getPowerGeneration();
 		this.getPlannedPower();
 		this.getAnnualCompletion();
@@ -254,6 +261,21 @@ export default {
 		this.getAffectedOnSite();
 		this.getAnnualRationing();
 		this.getMonthlyRationing();
+		this.getWindMonthlyAverageSpeed();
+		this.getAllMonthlyPlanned();
+		this.getWindMonthlyPlaned();
+		this.getWindMonthlyActualPower();
+		this.getMonthlyPowerTransmission();
+		this.getMonthlyGeneratorSet();
+		this.getAnnualAccumulation();
+		this.getMonthlyRationingLoss();
+		this.getAnnualPowerGrid();
+		this.getMonthlyPowerGrid();
+		this.getAnnualGeneratorSet();
+		this.getScheduledMonthlyGeneratorSet();
+	},
+  	mounted() {
+	
 	},
 	beforeDestroy(){
 	},
@@ -342,6 +364,16 @@ export default {
 				console.log(error)
 			})
 		},
+		getWindMonthlyAverageSpeed() {
+			this.$http.sx.getWindMonthlyAverageSpeed({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getWindMonthlyAverageSpeedData = res.data.rowData;
+				}
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
 		getAnnualRationing() {
 			this.$http.sx.getAnnualRationing({
 			}).then(res => {
@@ -357,6 +389,117 @@ export default {
 			}).then(res => {
 				if (res.code === 0) {
 					this.getMonthlyRationingData = res.data.rowData;
+				}
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getAllMonthlyPlanned() {
+			this.$http.sx.getAllMonthlyPlanned({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getAllMonthlyPlannedData = res.data.rowData;
+				}
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getWindMonthlyPlaned() {
+			this.$http.sx.getWindMonthlyPlaned({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getWindMonthlyPlanedData = res.data.rowData;
+				}
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getWindMonthlyActualPower() {
+			this.$http.sx.getWindMonthlyActualPower({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getWindMonthlyActualPowerData = res.data.rowData;
+				}
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getMonthlyPowerTransmission() {
+			this.$http.sx.getMonthlyPowerTransmission({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getMonthlyPowerTransmissionData = res.data.rowData;
+				}
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getMonthlyGeneratorSet() {
+			this.$http.sx.getMonthlyGeneratorSet({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getMonthlyGeneratorSetData = res.data.rowData;
+				}
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getAnnualAccumulation() {
+			this.$http.sx.getAnnualAccumulation({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getAnnualAccumulationData = res.data.rowData;
+				}
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getMonthlyRationingLoss() {
+			this.$http.sx.getMonthlyRationingLoss({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getMonthlyRationingLossData = res.data.rowData;
+				}
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getAnnualPowerGrid() {
+			this.$http.sx.getAnnualPowerGrid({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getAnnualPowerGridData = res.data.rowData;
+				}
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getMonthlyPowerGrid() {
+			this.$http.sx.getMonthlyPowerGrid({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getMonthlyPowerGridData = res.data.rowData;
+				}
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getAnnualGeneratorSet() {
+			this.$http.sx.getAnnualGeneratorSet({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getAnnualGeneratorSetData = res.data.rowData;
+					console.log(123,this.getAnnualGeneratorSetData)
+				}
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getScheduledMonthlyGeneratorSet() {
+			this.$http.sx.getScheduledMonthlyGeneratorSet({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getScheduledMonthlyGeneratorSetData = res.data.rowData;
 				}
 			}).catch((error)=>{
 				console.log(error)
@@ -533,7 +676,7 @@ export default {
 				justify-content: space-between;
 				margin-top:30px;
 				.ElectricityStatistics_div{
-					width: 470px;
+					width: 500px;
 					height: 86px;
 					display: flex;
 					gap: 17px;
