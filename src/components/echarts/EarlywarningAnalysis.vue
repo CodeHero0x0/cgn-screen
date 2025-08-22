@@ -15,29 +15,27 @@
 <script>
 export default {
   name: 'PowerGenerationChart',
-  props:[
-	'echartsData',
-  	'predictionData'
-  ],
+  props: {
+    echartsData: {
+      type: Array,
+      default: () => []
+    }
+  },
   data() {
     return {
       activeTab: 'all',
       timeType: 'month',
       chart: null,
-      totalPredicted: 0,
-      totalActual: 0,
-      completionRate: 0,
+      totalWarnings: 0,
       avgResource: 0,
       chartData: {
         all: {
 			month: {
-				predicted: [644.557, 879.606, 874.198, 956.398, 770.51, 949.894, 1107.971], // 柱状图数据
-				actual: [],
-				resource: [] // 这里会根据predicted数据计算
+				warnings: [], // 预警条数数据
+				resource: [] // 这里会根据warnings数据计算
 			},
 			year: {
-				predicted: [],
-				actual: [],
+				warnings: [],
 				resource: []
 			}
         }
@@ -46,13 +44,17 @@ export default {
   },
   computed: {
     xAxisData() {
-      // 模拟图片中的X轴标签
-      return ['模拟图片中', '模拟图片中', '模拟图片中', '模拟图片中', '模拟图片中', '模拟图片中', '模拟图片中']
+      // 从 echartsData 获取 metric_name 作为 X 轴数据
+      return this.echartsData.map(item => item.metric_name || '');
+    },
+    warningsData() {
+      // 从 echartsData 获取 metric_value 作为预警条数数据
+      return this.echartsData.map(item => parseFloat(item.metric_value) || 0);
+    },
+    dataUnit() {
+      // 获取数据单位
+      return this.echartsData.length > 0 ? this.echartsData[0].unit : '条';
     }
-  },
-  created(){
-	this.chartData.all.month.predicted = this.predictionData;
-	console.log(11111111111,this.chartData.all.month.predicted)
   },
   mounted() {
 	this.initializeData()
@@ -62,6 +64,19 @@ export default {
 	})
   },
   
+  watch: {
+    echartsData: {
+      handler() {
+        this.initializeData();
+        this.$nextTick(() => {
+          this.updateData();
+          this.updateChart();
+        });
+      },
+      deep: true
+    }
+  },
+  
   beforeDestroy() {
     if (this.chart) {
       this.chart.dispose()
@@ -69,13 +84,13 @@ export default {
   },
   
   methods: {
-    // 根据柱体数据计算对应的资源数据（这里可以自定义转换逻辑）
-    calculateResourceFromPredicted(predictedData) {
-      // 示例：根据发电量计算对应的风速或其他资源指标
+    // 根据预警条数数据计算对应的资源数据（这里可以自定义转换逻辑）
+    calculateResourceFromWarnings(warningsData) {
+      // 示例：根据预警条数计算对应的资源指标
       // 这里简单按比例转换，您可以根据实际业务逻辑调整
-      return predictedData.map(value => {
-        // 假设发电量30对应风速7.41，按比例计算
-        const resourceValue = (value / 30) * 7.41
+      return warningsData.map(value => {
+        // 假设预警条数36对应资源指标7.41，按比例计算
+        const resourceValue = (value / 36) * 7.41
         return parseFloat(resourceValue.toFixed(2))
       })
     },
@@ -89,25 +104,19 @@ export default {
       return data
     },
     
-    generateActualData(predictedData) {
-      return predictedData.map(predicted => {
-        const ratio = 0.85 + Math.random() * 0.2
-        return Math.round(predicted * ratio)
-      })
-    },
-    
     initializeData() {
-      // 根据柱体数据计算资源数据
-      this.chartData.all.month.resource = this.calculateResourceFromPredicted(this.chartData.all.month.predicted)
+      // 设置预警条数数据
+      this.chartData.all.month.warnings = this.warningsData;
+      // 根据预警条数数据计算资源数据
+      this.chartData.all.month.resource = this.calculateResourceFromWarnings(this.warningsData);
     },
     
     updateData() {
       const data = this.chartData[this.activeTab][this.timeType]
-      this.totalPredicted = data.predicted.reduce((sum, val) => sum + val, 0)
-      this.totalActual = data.actual.reduce((sum, val) => sum + val, 0)
-      this.completionRate = Math.round((this.totalActual / this.totalPredicted) * 100)
+      this.totalWarnings = data.warnings.reduce((sum, val) => sum + val, 0)
       // 计算资源数据的平均值
-      this.avgResource = (data.resource.reduce((sum, val) => sum + val, 0) / data.resource.length).toFixed(2)
+      this.avgResource = data.resource.length > 0 ? 
+        (data.resource.reduce((sum, val) => sum + val, 0) / data.resource.length).toFixed(2) : 0
     },
     
     initChart() {
@@ -165,7 +174,7 @@ export default {
                 let result = `<div style="padding: 8px 0; border-bottom: 1px solid #333; margin-bottom: 8px;">${params[0].axisValue}</div>`
                 
                 params.forEach(param => {
-                    let unit = param.seriesName === '平均风速' ? 'm/s' : '万kWh'
+                    let unit = param.seriesName === '平均风速' ? 'm/s' : this.dataUnit
                     result += `
                         <div style="margin: 4px 0; display: flex; justify-content: space-between; align-items: center;">
                             <span style="display: flex; align-items: center;">
@@ -232,10 +241,10 @@ export default {
         ],
         series: [
             {
-                name: '预测发电量',
+                name: '预警条数',
                 type: 'bar',
                 yAxisIndex: 0,
-                data: data.predicted,
+                data: data.warnings,
                 barWidth: 25,
                 itemStyle: {
                     // 透明渐变：从底部透明到顶部不透明
@@ -258,7 +267,7 @@ export default {
                         color: '#00C2FF',
                         borderWidth: 0
                     },
-                    data: data.predicted.map((value, index) => ({
+                    data: data.warnings.map((value, index) => ({
                         coord: [index, value], // 在柱子顶端的坐标
                         value: ''
                     })),

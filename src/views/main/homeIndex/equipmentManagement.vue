@@ -35,11 +35,7 @@
 							</div>
                             <div class="realTime">
 								<h2><span>(万kWh)</span></h2>
-								<RealTimeOutput  
-								:yearbefore="yearbefore"
-								:lastyear="lastyear"
-								:thisyear="thisyear">
-							</RealTimeOutput>
+								<RealTimeOutput :yearbefore="getRealTimeOutputData"></RealTimeOutput>
 							</div>
                         </div>
                         <div class="Alarm-prompt">
@@ -59,7 +55,7 @@
 							</div>
                             <div class="analysis">
 								<h2></h2>
-								<EarlywarningAnalysis class="EarlywarningAnalysis" :echartsData="getAlarmPromptData" :predictionData="chartData"></EarlywarningAnalysis>
+								<EarlywarningAnalysis class="EarlywarningAnalysis" :echartsData="getEarlyWarningAnalysisData" ></EarlywarningAnalysis>
 							</div>
                         </div>
                     </div>
@@ -128,103 +124,43 @@
 					<button>设备管控</button>
 				</div>
 			</div>
-			<!-- <div class="conRight">
+			<div class="conRight">
 				<div class="Intelligent-patrol">
 					<h2></h2>
 					<div class="Inspection-statistics">
 						<h2></h2>
+						<PatrolPieCharts :echartsData="getInspectionStatisticsData"></PatrolPieCharts>
 					</div>
 					<div class="reliability-index">
 						<h2></h2>
 						<div class="reliability-index-div">
-							<div>
-								<p>0%</p>
-								<p>巡视点位漏检率</p>
-							</div>
-							<div>
-								<p>0%</p>
-								<p>巡视点位漏检率</p>
-							</div>
-							<div>
-								<p>0%</p>
-								<p>巡视点位漏检率</p>
-							</div>
-							<div>
-								<p>0%</p>
-								<p>巡视点位漏检率</p>
+							<div v-for="value in getReliabilityIndexData">
+								<p>{{value.metric_value}}</p>
+								<p>{{ value.metric_name }}</p>
 							</div>
 						</div>
 					</div>
 					<div class="Alarm-Statistics">
 						<h2></h2>
-						<monitorEarlyWarning class="earlyWarning" :events="events" :columns="eventColumns" ></monitorEarlyWarning>
+						<UnmannedAirportStation class="earlyWarning" :echartsData="getAlarmStatisticsData" :predictionData="eventColumns_Alarm" ></UnmannedAirportStation>
 					</div>
 					<div class="UAV">
 						<h2></h2>
 						<div class="UAV-div">
 							<div class="UAV-left">
-								<p>
-									<span>摄像头<i></i></span>
-									<span>60</span>
-									<span>(台)</span>
-								</p>
-								<p>
-									<span>摄像头<i></i></span>
-									<span>60</span>
-									<span>(台)</span>
-
-								</p>
-								<p>
-									<span>摄像头<i></i></span>
-									<span>60</span>
-									<span>(台)</span>
-
-								</p>
-								<p>
-									<span>摄像头<i></i></span>
-									<span>60</span>
-									<span>(台)</span>
-
-								</p>
-								<p>
-									<span>摄像头<i></i></span>
-									<span>60</span>
-									<span>(台)</span>
-
+								<p v-for="value in getUnmannedAerialVehicleData">
+									<span>{{ value.metric_name }}<i></i></span>
+									<span>{{ value.metric_value }}</span>
+									<span>({{ value.unit }})</span>
 								</p>
 							</div>
 							<div class="UAV-right">
 								<div class="Intelligent-inspection-right">
 									<div class="Inspection-details">
-										<p>
-											<span class="xj-guangfu"></span>
-											<span>光伏累计巡检</span>
-											<span>10753<i> (GW)</i></span>
-										</p>
-										<p>
-											<span class="xj-fengdian"></span>
-											<span>风电累计巡检</span>
-											<span>28696<i> (MW)</i></span>
-										</p>
-										<p>
-											<span class="xj-jidian"></span>
-											<span>集电线路累计巡检</span>
-											<span>458<i> (KW)</i></span>
-										</p>
-										<p>
-											<span class="lj-guangfu"></span>
-											<span>累计巡检组件<i> </i></span>
-											<span>10753<i> (万块)</i></span>
-										</p>
-										<p>
-											<span class="lj-fengdian"></span>
-											<span>累计巡检台数<i> </i></span>
-											<span>10753<i> (台)</i></span>
-										</p>
-										<p>
-											<span class="lj-jidian"></span>
-											<span>累计巡检杆塔<i> </i></span>
-											<span>28696<i> (座)</i></span>
+										<p v-for="(item, index) in getDroneInspectionData" :key="index">
+											<span :class="getIconClass(item.metric_name, index)"></span>
+											<span>{{ item.metric_name }}</span>
+											<span>{{ item.metric_value }}<i> {{ item.unit }}</i></span>
 										</p>
 									</div>
 								</div>
@@ -233,13 +169,13 @@
 						
 					</div>
 					<div class="Station-warning">
-						<monitorEarlyWarning class="earlyWarning" :events="events" :columns="eventColumns" ></monitorEarlyWarning>
+						<UnmannedAirportStation class="earlyWarning" :echartsData="getUavStationData" :predictionData="eventColumns_Station" ></UnmannedAirportStation>
 					</div>
 				</div>
 				<div class="IOM">
 					<h2></h2>
 					<div class="Personnel-and-vehicles">
-						<div class="staff-vehicle">
+						<div class="staff-vehicle" v-if="getPersonnelAndVehiclesData.length > 0">
 							<div class="staff">
 								<p class="staff-p1">人员</p>
 								<p class="staff-p2"></p>
@@ -247,30 +183,30 @@
 									<p class="staff-div-p1">
 										<span class="staff-span1">内部人员-专工
                                             <i></i>
-                                            <span>8.28</span>
+                                            <span>{{ getPersonnelAndVehiclesData[0].metric_name }}</span>
                                         </span>
 										<span class="staff-span2">内部人员-技术
                                              <i></i>
-                                            <span>5.51</span>
+                                            <span>{{ getPersonnelAndVehiclesData[0].metric_value }}</span>
                                         </span>
 										<span class="staff-span3">内部人员-运维
                                              <i></i>
-                                            <span>6.3</span>
+                                            <span>{{ getPersonnelAndVehiclesData[0].unit }}</span>
                                         </span>
 									</p>
 									<p  class="staff-div-Divider"></p>
 									<p class="staff-div-p2">
 										<span class="staff-span1">外来人员-总数
                                              <i></i>
-                                            <span>42</span>
+											 <span>{{ getPersonnelAndVehiclesData[1].metric_name }}</span>
                                         </span>
 										<span class="staff-span2">外来人员-入场数
                                              <i></i>
-                                            <span>29.13</span>
+											 <span>{{ getPersonnelAndVehiclesData[1].metric_value }}</span>
                                         </span>
 										<span class="staff-span3">外来人员-在场数
                                              <i></i>
-                                            <span>42</span>
+											 <span>{{ getPersonnelAndVehiclesData[1].unit }}</span>
                                         </span>
 									</p>
 								</div>
@@ -282,15 +218,15 @@
 									<p class="staff-div-p1">
                                         <span class="staff-span1">运营车辆总数
                                             <i></i>
-                                            <span>42.34</span>
+											<span>{{ getPersonnelAndVehiclesData[2].metric_name }}</span>
                                         </span>
 										<span class="staff-span2">工作车辆
                                             <i></i>
-                                            <span>6.89</span>
+                                            <span>{{ getPersonnelAndVehiclesData[2].metric_value }}</span>
                                         </span>
 										<span class="staff-span3">外来车辆
                                             <i></i>
-                                            <span>42.34</span>
+                                            <span>{{ getPersonnelAndVehiclesData[2].unit }}</span>
                                         </span>
 									</p>
 								</div>
@@ -299,13 +235,13 @@
 					</div>
 					<div class="Maintenance-tasks">
 						<h2></h2>
-						<MaintenanceTasks class="MaintenanceTasks" :StackedBarChartData="StackedBarChartData1"></MaintenanceTasks>
+						<MaintenanceTasks class="MaintenanceTasks" :StackedBarChartData="getMaintenanceTasksData"></MaintenanceTasks>
 						<div class="bottom"></div>
 					</div>
 					<div class="Work-OrderList">
-						<monitorEarlyWarning class="earlyWarning" :events="events" :columns="eventColumns" ></monitorEarlyWarning>
+						<UnmannedAirportStation class="earlyWarning" :echartsData="getWorkOrderListData" :predictionData="eventColumns_Work" ></UnmannedAirportStation>
 					</div>
-					<div class="Work-order-content">
+					<div class="Work-order-content" v-if="getWorkTicketData.length > 0">
 						<div class="Work-order-content-left">
 							<h2></h2>
 							<div>
@@ -313,68 +249,68 @@
 								<p>
 									<span>工作票票号</span>
 									<i></i>
-									<span>DT12545555234487112</span>
+									<span>{{ getWorkTicketData[0].sub_category }}</span>
 								</p>
 								<p class="stationname">
 									<span class="stationname-p1">
 										<span>场站名称</span>
 										<i></i>
-										<span>场站名称场场站名称场站名称场站名称站名称场站名称</span>
+										<span>{{ getWorkTicketData[0].four_category }}</span>
 									</span>
 									<span class="stationname-p2">
 										<span>工作负责人</span>
 										<i></i>
-										<span>2</span>
+										<span>{{ getWorkTicketData[0].metric_name }}</span>
 									</span>
 								</p>
 								<p>
 									<span>工作类型</span>
 									<i></i>
-									<span>风机式交专用工作票</span>
+									<span>{{ getWorkTicketData[0].metric_value }}</span>
 								</p>
 								<p>
 									<span>工作票内容</span>
 									<i></i>
-									<span>X03号风机hfuiwehf告警处理</span>
+									<span>{{ getWorkTicketData[0].unit }}</span>
 								</p>
 							</div>
 						</div>
 						<div class="Work-order-content-right">
 							<h2></h2>
 							<div>
-								<button>接收</button>
+								<button>查看全部</button>
 								<p>
-									<span>工作票票号</span>
+									<span>场站</span>
 									<i></i>
-									<span>DT12545555234487112</span>
+									<span>{{ getOperationTicketData[0].sub_category }}</span>
 								</p>
 								<p class="stationname">
 									<span class="stationname-p1">
-										<span>场站名称</span>
+										<span>发令人</span>
 										<i></i>
-										<span>场站名称场场站名称场站名称场站名称站名称场站名称</span>
+										<span>{{ getOperationTicketData[0].four_category }}</span>
 									</span>
 									<span class="stationname-p2">
-										<span>工作负责人</span>
+										<span>受令人</span>
 										<i></i>
-										<span>2</span>
+										<span>{{ getOperationTicketData[0].metric_name }}</span>
 									</span>
 								</p>
 								<p>
-									<span>工作类型</span>
+									<span>操作开始时间</span>
 									<i></i>
-									<span>风机式交专用工作票</span>
+									<span>{{ getOperationTicketData[0].metric_value }}</span>
 								</p>
 								<p>
-									<span>工作票内容</span>
+									<span>操作接收时间</span>
 									<i></i>
-									<span>X03号风机hfuiwehf告警处理</span>
+									<span>{{ getOperationTicketData[0].unit }}</span>
 								</p>
 							</div>
 						</div>
 					</div>
 				</div>
-			</div> -->
+			</div>
         </div>
     </div>
 </template>
@@ -389,6 +325,9 @@ import WeatherWarning from "@COM/StyleComponent/WeatherWarning.vue";
 import RiskChart from "@COM/echarts/RiskChart.vue";
 import HourlyRanking from "@COM/echarts/HourlyRanking.vue";
 import HourBenchmarking from "@COM/echarts/HourBenchmarking.vue";
+import UnmannedAirportStation from "@COM/StyleComponent/UnmannedAirportStation.vue";
+import PatrolPieCharts from "@COM/echarts/PatrolPieCharts.vue";
+
 export default {
   	name: "homeIndex",
   	components: {
@@ -400,6 +339,8 @@ export default {
 		RiskChart,
 		HourlyRanking,
 		HourBenchmarking,
+		UnmannedAirportStation,
+		PatrolPieCharts,
   	},
 	data() {
 		return {
@@ -455,6 +396,27 @@ export default {
 				{ key: 'content2', title: '机型编号', flex: '15%' },
 				{ key: 'content3', title: '风机名称', flex: '15%' },
 				{ key: 'time', title: '预警时间', flex: '0 0 30%',}
+			],
+			eventColumns_Alarm:[
+				{ key: 'sub_category', title: '场站', flex: '0 0 15%', type: 'priority' },
+				{ key: 'four_category', title: '设备', flex: '15%' },
+				{ key: 'metric_name', title: '位置', flex: '10%' },
+				{ key: 'metric_value', title: '等级', flex: '10%' },
+				{ key: 'unit', title: '状态', flex: '25%' },
+				{ key: 'description', title: '时间', flex: '0 0 30%',}
+			],
+			eventColumns_Station:[	
+				{ key: 'sub_category', title: '场站', flex: '0 0 15%', type: 'priority' },
+				{ key: 'four_category', title: '设备', flex: '15%' },
+				{ key: 'metric_name', title: '位置', flex: '10%' },
+				{ key: 'metric_value', title: '类型', flex: '20%' },
+				{ key: 'unit', title: '时间', flex: '0 0 30%',}
+			],
+			eventColumns_Work:[	
+				{ key: 'sub_category', title: '工单编号', flex: '0 0 25%', type: 'priority' },
+				{ key: 'four_category', title: '工单描述', flex: '45%' },
+				{ key: 'metric_name', title: '场站', flex: '15%' },
+				{ key: 'metric_value', title: '工单类型', flex: '15%' },
 			],
 			//设备管控/智慧监控
 			getWarningDetailsData:[],
@@ -735,6 +697,40 @@ export default {
 				console.log(error)
 			})
 		},
+		getIconClass(metricName, index) {
+			// 根据指标名称或索引返回对应的图标类名
+			const iconClasses = [
+				'xj-guangfu',    // 光伏累计巡检
+				'xj-fengdian',   // 风电累计巡检
+				'xj-jidian',     // 集电线路累计巡检
+				'lj-guangfu',    // 累计巡检组件
+				'lj-fengdian',   // 累计巡检台数
+				'lj-jidian'      // 累计巡检杆塔
+			];
+			
+			// 方法1：根据索引返回
+			if (index < iconClasses.length) {
+				return iconClasses[index];
+			}
+			
+			// 方法2：根据名称匹配（备用方案）
+			if (metricName.includes('光伏')) {
+				return 'xj-guangfu';
+			} else if (metricName.includes('风电累计巡检')) {
+				return 'xj-fengdian';
+			} else if (metricName.includes('集电线路')) {
+				return 'xj-jidian';
+			} else if (metricName.includes('累计巡检组件')) {
+				return 'lj-guangfu';
+			} else if (metricName.includes('累计巡检台数')) {
+				return 'lj-fengdian';
+			} else if (metricName.includes('累计巡检杆塔')) {
+				return 'lj-jidian';
+			}
+			
+			// 默认返回第一个图标类
+			return iconClasses[0];
+		}
 	},
 }
 </script>
@@ -1232,9 +1228,9 @@ export default {
 				background: url("../../../assets/images/equipmentManagement/zhinengxunshi.png") center center no-repeat;
 			}
 			.Inspection-statistics{
+				position: relative;
 				width: 100%;
 				height: 287px;
-				background: #f90;
 				margin-top: 20px;
 				h2{
 					width: 100%;
@@ -1259,9 +1255,8 @@ export default {
 					gap: 30PX;
 					margin-top: 20PX;
 					div{
-						width: 206px;
-						height: 86px;
-						padding: 15px 57px 14px 58px;
+						width: 322px;
+						height: 116px;
 						border-radius: 12%;
 						background: url("../../../assets/images/CompanyOverview/di.png") center center no-repeat;
 						P:first-child{
@@ -1750,23 +1745,32 @@ export default {
 						}
 						.stationname{
 							display: flex;
-							.stationname-p1{
+							.stationname-p1, .stationname-p2{
 								flex: 1;
-								display: inline-block;
-								span:nth-child(3){
-									color: #A3C5FF;
-									white-space: nowrap; /* 防止文本换行 */
-									overflow: hidden; /* 隐藏溢出的内容 */
-									text-overflow: ellipsis; /* 显示省略符号来代表被修剪的文本 */
-									width: 140px;
-									display: inline-block;
-									height: 42px;
-									line-height: 42px;
+								display: flex; // 改为flex布局
+								align-items: center;
+								
+								span:first-child { // "发令人"/"受令人"
+									width: 80px; // 给标签固定宽度
+									flex-shrink: 0;
 								}
-							}
-							.stationname-p2{
-								flex: 1;
-								display: inline-block;
+								
+								i {
+									width: 16px;
+									height: 28px;
+									background: url("../../../assets/images/CompanyOverview/Frame 427320549.png") 0% center no-repeat;
+									margin: 0 10px;
+									flex-shrink: 0;
+								}
+								
+								span:nth-child(3) { // 数据内容
+									color: #A3C5FF;
+									white-space: nowrap;
+									overflow: hidden;
+									text-overflow: ellipsis;
+									flex: 1; // 占据剩余空间
+									min-width: 0; // 允许缩小
+								}
 							}
 						}
 					}
@@ -1791,13 +1795,13 @@ export default {
 						padding-left: 40px;
 						button{
 							position: relative;
-							left: 540px;
+							left: 465px;
 							top: 20px;
 							padding: 2px 10px;
 							justify-content: center;
 							align-items: center;
 							gap: 10px;
-							width: 96px;
+							width: 150px;
 							height: 38px;
 							background: url("../../../assets/images/CompanyOverview/di.png") no-repeat;
 							color: #FFF;
@@ -1835,23 +1839,32 @@ export default {
 						}
 						.stationname{
 							display: flex;
-							.stationname-p1{
+							.stationname-p1, .stationname-p2{
 								flex: 1;
-								display: inline-block;
-								span:nth-child(3){
-									color: #A3C5FF;
-									white-space: nowrap; /* 防止文本换行 */
-									overflow: hidden; /* 隐藏溢出的内容 */
-									text-overflow: ellipsis; /* 显示省略符号来代表被修剪的文本 */
-									width: 140px;
-									display: inline-block;
-									height: 42px;
-									line-height: 42px;
+								display: flex; // 改为flex布局
+								align-items: center;
+								
+								span:first-child { // "发令人"/"受令人"
+									width: 80px; // 给标签固定宽度
+									flex-shrink: 0;
 								}
-							}
-							.stationname-p2{
-								flex: 1;
-								display: inline-block;
+								
+								i {
+									width: 16px;
+									height: 28px;
+									background: url("../../../assets/images/CompanyOverview/Frame 427320549.png") 0% center no-repeat;
+									margin: 0 10px;
+									flex-shrink: 0;
+								}
+								
+								span:nth-child(3) { // 数据内容
+									color: #A3C5FF;
+									white-space: nowrap;
+									overflow: hidden;
+									text-overflow: ellipsis;
+									flex: 1; // 占据剩余空间
+									min-width: 0; // 允许缩小
+								}
 							}
 						}
 					}

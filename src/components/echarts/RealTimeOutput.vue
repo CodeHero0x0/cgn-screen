@@ -31,16 +31,7 @@ export default {
 	props: {
         yearbefore: {
             type: Array,
-            required: true
-        },
-        lastyear: {
-            type: Array,
-            required: false,
-            default: () => []
-        },
-        thisyear: {
-            type: Array,
-            required: false,
+            required: true,
             default: () => []
         }
     },
@@ -54,188 +45,194 @@ export default {
 	mounted() {
 	  this.renderBar(); 
 	},
+    watch: {
+        yearbefore: {
+            handler() {
+                this.$nextTick(() => {
+                    this.renderBar();
+                });
+            },
+            deep: true
+        }
+    },
 	methods: {
         renderBar() {
-    const chartDom = this.$refs.chart; 
-    this.myChart = echarts.init(chartDom);
-    const percentageData = this.yearbefore.map(v => (v / this.total) * 100);
-    const lastYearData = this.lastyear.map(v => (v / this.total) * 100);
-    const thisYearData = this.thisyear.map(v => (v / this.total) * 100);
-    
-    const option = {
-        xAxis: {
-            type: 'category',
-            data: [],
-            axisLine: {
-                lineStyle: {
-                    color: '#2d5a87',
-                    width: 2,
-                    type: 'dashed'
-                }
-            },
-            axisTick: {
-                show: true,
-                lineStyle: {
-                    color: '#2d5a87',
-                    type: 'dashed'
-                }
-            },
-            axisLabel: {
-                color: '#FFFFFFCC',
-                fontSize: 26,
-                margin: 30,
-                interval: 0
+            if (!this.yearbefore || this.yearbefore.length === 0) {
+                return;
             }
-        },
-        yAxis: {
-            type: 'value',
-            axisLine: {
-                lineStyle: {
-                    color: '#2d5a87',
-                    width: 2,
-                    type: 'dashed'
-                }
-            },
-            axisLabel: {
-                fontSize: 26,
-                formatter: '{value} ',
-                color: '#2CD7FF',
-            },
-            splitLine: {
-                lineStyle: {
-                    type: 'dashed',
-                    color: '#2d5a87'
-                }
-            }
-        },
-        grid: {
-            left: '50',
-            right: '20',
-            top: '50',
-            bottom: '40',
-            containLabel: true
-        },
-        legend: {
-            top: 0,
-            right: 10,
-            textStyle: {
-                color: '#ffffff',
-                fontSize: 26
-            },
-            // 这里设置图例的icon为'none'
-            itemStyle: {
-                borderColor: 'transparent',
-                borderWidth: 0
-            },
-            // 自定义图例的item样式
-            rich: {
-                icon: {
-                    width: 10,
-                    height: 10,
-                    backgroundColor: {
-                        image: 'url(huangse)' // 替换为您的曲线图标的URL
-                    }
-                }
-            }
-        },
 
-        series: [
-            {
-                type: 'line',
-                data: thisYearData,
-                lineStyle: {
-                    color: '#fff', // 线条颜色
-                    width: 3,
-                    type: 'solid' // 线条类型
-                },
-                areaStyle: {
-                    color: {
-                        type: 'linear',
-                        x: 0,
-                        y: 0,
-                        x2: 0,
-                        y2: 1,
-                        colorStops: [
-                            { offset: 0, color: 'rgba(210, 239, 255, 0.2)' }, // 0% 处的颜色
-                            { offset: 1, color: 'rgba(210, 239, 255, 0)' } // 100% 处的颜色
-                        ],
-                        global: false // 缺省为 false
+            const chartDom = this.$refs.chart; 
+            this.myChart = echarts.init(chartDom);
+            
+            // 从 yearbefore 数据中提取各个系列的数据
+            const xAxisData = this.yearbefore.map(item => item.four_category); // 时间
+            const totalData = this.yearbefore.map(item => parseFloat(item.metric_name) || 0); // 总计
+            const windData = this.yearbefore.map(item => parseFloat(item.metric_value) || 0); // 风电
+            const solarData = this.yearbefore.map(item => parseFloat(item.unit) || 0); // 光伏
+            
+            const option = {
+                xAxis: {
+                    type: 'category',
+                    data: xAxisData,
+                    axisLine: {
+                        lineStyle: {
+                            color: '#2d5a87',
+                            width: 2,
+                            type: 'dashed'
+                        }
+                    },
+                    axisTick: {
+                        show: true,
+                        lineStyle: {
+                            color: '#2d5a87',
+                            type: 'dashed'
+                        }
+                    },
+                    axisLabel: {
+                        color: '#FFFFFFCC',
+                        fontSize: 26,
+                        margin: 30,
+                        interval: 0
                     }
                 },
-                // 删除符号
-                symbol: 'none'
-            },
-            {
-                type: 'line',
-                data: lastYearData,
-                lineStyle: {
-                    color: '#03FFFF', // 去年颜色
-                    width: 3,
-                    type: 'solid' // 线条类型
-                },
-                areaStyle: {
-                    color: {
-                        type: 'linear',
-                        x: 0,
-                        y: 0,
-                        x2: 0,
-                        y2: 1,
-                        colorStops: [
-                            { offset: 0, color: 'rgba(3, 255, 255, 0.2)' },
-                            { offset: 1, color: 'rgba(3, 255, 255, 0)' }
-                        ],
-                        global: false
+                yAxis: {
+                    type: 'value',
+                    axisLine: {
+                        lineStyle: {
+                            color: '#2d5a87',
+                            width: 2,
+                            type: 'dashed'
+                        }
+                    },
+                    axisLabel: {
+                        fontSize: 26,
+                        formatter: '{value} ',
+                        color: '#2CD7FF',
+                    },
+                    splitLine: {
+                        lineStyle: {
+                            type: 'dashed',
+                            color: '#2d5a87'
+                        }
                     }
                 },
-                // 删除符号
-                symbol: 'none'
-            },
-            {
-                type: 'line',
-                data: percentageData,
-                lineStyle: {
-                    color: '#FFB10B', // 前年颜色
-                    width: 3,
-                    type: 'solid' // 线条类型
+                grid: {
+                    left: '50',
+                    right: '20',
+                    top: '50',
+                    bottom: '40',
+                    containLabel: true
                 },
-                areaStyle: {
-                    color: {
-                        type: 'linear',
-                        x: 0,
-                        y: 0,
-                        x2: 0,
-                        y2: 1,
-                        colorStops: [
-                            { offset: 0, color: 'rgba(255, 221, 148, 0.2)' },
-                            { offset: 1, color: 'rgba(255, 221, 148, 0)' }
-                        ],
-                        global: false
+                legend: {
+                    top: 0,
+                    right: 10,
+                    textStyle: {
+                        color: '#ffffff',
+                        fontSize: 26
+                    },
+                    data: ['总计', '风电', '光伏'],
+                    itemStyle: {
+                        borderColor: 'transparent',
+                        borderWidth: 0
                     }
                 },
-                // 删除符号
-                symbol: 'none'
+                series: [
+                    {
+                        type: 'line',
+                        data: totalData,
+                        lineStyle: {
+                            color: '#FFB10B', // 总计颜色
+                            width: 3,
+                            type: 'solid'
+                        },
+                        areaStyle: {
+                            color: {
+                                type: 'linear',
+                                x: 0,
+                                y: 0,
+                                x2: 0,
+                                y2: 1,
+                                colorStops: [
+                                    { offset: 0, color: 'rgba(255, 221, 148, 0.2)' },
+                                    { offset: 1, color: 'rgba(255, 221, 148, 0)' }
+                                ],
+                                global: false
+                            }
+                        },
+                        symbol: 'none'
+                    },
+                    {
+                        type: 'line',
+                        data: windData,
+                        lineStyle: {
+                            color: '#03FFFF', // 风电颜色
+                            width: 3,
+                            type: 'solid'
+                        },
+                        areaStyle: {
+                            color: {
+                                type: 'linear',
+                                x: 0,
+                                y: 0,
+                                x2: 0,
+                                y2: 1,
+                                colorStops: [
+                                    { offset: 0, color: 'rgba(3, 255, 255, 0.2)' },
+                                    { offset: 1, color: 'rgba(3, 255, 255, 0)' }
+                                ],
+                                global: false
+                            }
+                        },
+                        symbol: 'none'
+                    },
+                    {
+                        type: 'line',
+                        data: solarData,
+                        lineStyle: {
+                            color: '#fff', // 光伏颜色
+                            width: 3,
+                            type: 'solid'
+                        },
+                        areaStyle: {
+                            color: {
+                                type: 'linear',
+                                x: 0,
+                                y: 0,
+                                x2: 0,
+                                y2: 1,
+                                colorStops: [
+                                    { offset: 0, color: 'rgba(210, 239, 255, 0.2)' },
+                                    { offset: 1, color: 'rgba(210, 239, 255, 0)' }
+                                ],
+                                global: false
+                            }
+                        },
+                        symbol: 'none'
+                    }
+                ]
+            };
+
+            this.myChart.setOption(option);
+
+            window.addEventListener('resize', () => this.myChart.resize());
+        },
+        
+        highlightLine(index) {
+            if (this.myChart) {
+                this.myChart.dispatchAction({
+                    type: 'highlight',
+                    seriesIndex: index,
+                });
             }
-        ]
-    };
-
-    this.myChart.setOption(option);
-
-    window.addEventListener('resize', () => this.myChart.resize());
-},
-
-    
-    highlightLine(index) {
-        this.myChart.dispatchAction({
-            type: 'highlight',
-            seriesIndex: index,
-        });
-    },
-    unhighlightLine(index) {
-        this.myChart.dispatchAction({
-            type: 'downplay',
-            seriesIndex: index,
-        });
-    }
+        },
+        unhighlightLine(index) {
+            if (this.myChart) {
+                this.myChart.dispatchAction({
+                    type: 'downplay',
+                    seriesIndex: index,
+                });
+            }
+        }
 	}
 }
 </script>

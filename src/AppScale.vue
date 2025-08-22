@@ -38,7 +38,7 @@ export default {
     return {
       containerSize: {
       //  width: 2640,
-        width: 3640,
+        width: 8640,
         height: 2160
       },
       scale: {
@@ -83,55 +83,56 @@ export default {
         //键盘按键判断:左箭头-37;上箭头-38；右箭头-39;下箭头-40
         // 0-48;  1-49;   2-50;     3-51;   4-52;      5-53;     6-54;      7-55;      8-56;        9-57;
                  //集团   //公司    //发展   //战略规划  //业务   // 产业链  //社会  // 党建      //企业文化
+                 console.log(1111111,e1.keyCode)
         if (e1 && e1.keyCode === 49) {
           this.$router.push({
-            name: "groupProfile",
+            name: "homeIndex",
             params: {}
           })
         } else if (e1 && e1.keyCode === 50) {
           this.$router.push({
-            name: "companyProfile",
+            name: "index",
             params: {}
           })
         } else if (e1 && e1.keyCode === 51) {
           this.$router.push({
-            name: "developmentHistory",
+            name: "ResourceEndowment",
             params: {}
           })
         } else if (e1 && e1.keyCode === 52) {
           this.$router.push({
-            name: "StrategicPlanning",
+            name: "equipmentManagement",
             params: {}
           })
         } else if (e1 && e1.keyCode === 53) {
           this.$router.push({
-            name: "BusinessLayout",
+            name: "index",
             params: {}
           })
         } else if (e1 && e1.keyCode === 54) {
           this.$router.push({
-            name: "IndustrialChain",
+            name: "index",
             params: {}
           })
         } else if (e1 && e1.keyCode === 55) {
           this.$router.push({
-            name: "SocialResponsibility",
+            name: "index",
             params: {}
           })
         } else if (e1 && e1.keyCode === 56) {
           this.$router.push({
-            name: "PartyAndGovernmentConstruction",
+            name: "index",
             params: {}
           })
         } else if (e1 && e1.keyCode === 57) {
           this.$router.push({
-            name: "CorporateCulture",
+            name: "index",
             params: {}
           })
         } else if (e1 && e1.keyCode === 48) {
 
           this.$router.push({
-            name: "homeIndex",
+            name: "index",
             params: {}
           })
         } else if (e1 && e1.keyCode === 81) {// 键盘q
