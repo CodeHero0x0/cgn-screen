@@ -1,8 +1,8 @@
 <template>
 	<div class="power-generation-chart">
 	  <!-- 头部控制区域 -->
-	  <div class="chart-header">
-		<span class="icon">{{echartsData.name}}</span>
+	  <div class="chart-header" :class="{ 'power-generation': echartsData.name === '发电量和资源','power-generationplan': echartsData.name === '计划发电情况' }">
+	
 		<div class="tabs">
 			<button 
 			  :class="{ active: activeTab === 'all' }" 
@@ -78,6 +78,9 @@ export default {
 	'all',
 	'windPower',
 	'photovoltaic',
+	'all_year',
+	'windPower_year',
+	'photovoltaic_year',
   ],
   data() {
     return {
@@ -135,7 +138,7 @@ export default {
     xAxisData() {
       const timeLabels = {
         month: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
-        year: ['2019年', '2020年', '2021年', '2022年', '2023年']
+		year: this.getYearLabels()
       }
       return timeLabels[this.timeType]
     }
@@ -186,10 +189,69 @@ export default {
         })
       },
       deep: true
+    },
+    // 添加年度数据的监听
+    all_year: {
+      handler() {
+        this.initializeData()
+        this.$nextTick(() => {
+          this.updateChart()
+          this.updateData()
+        })
+      },
+      deep: true
+    },
+    windPower_year: {
+      handler() {
+        this.initializeData()
+        this.$nextTick(() => {
+          this.updateChart()
+          this.updateData()
+        })
+      },
+      deep: true
+    },
+    photovoltaic_year: {
+      handler() {
+        this.initializeData()
+        this.$nextTick(() => {
+          this.updateChart()
+          this.updateData()
+        })
+      },
+      deep: true
     }
   },
   
   methods: {
+	getYearLabels() {
+		// 优先使用当前activeTab对应的年度数据
+		let yearData = null
+		
+		if (this.activeTab === 'all' && this.all_year) {
+		yearData = this.all_year
+		} else if (this.activeTab === 'wind' && this.windPower_year) {
+		yearData = this.windPower_year
+		} else if (this.activeTab === 'solar' && this.photovoltaic_year) {
+		yearData = this.photovoltaic_year
+		} else {
+		// 如果当前tab没有对应数据，尝试使用其他可用的年度数据
+		yearData = this.all_year || this.windPower_year || this.photovoltaic_year
+		}
+		
+		if (yearData && Array.isArray(yearData) && yearData.length > 0) {
+		// 从数据中提取four_category并排序
+		const categories = yearData.map(item => item.four_category).filter(Boolean)
+		return categories.sort((a, b) => {
+			const yearA = parseInt(a.replace('年', ''))
+			const yearB = parseInt(b.replace('年', ''))
+			return yearA - yearB
+		})
+		}
+		
+		// 如果没有数据，返回默认年份
+		return ['2018年', '2019年', '2020年', '2021年', '2022年', '2023年', '2024年', '2025年']
+	},
     generateRandomData(count, min, max, decimals = 0) {
       const data = []
       for (let i = 0; i < count; i++) {
@@ -215,152 +277,278 @@ export default {
       })
     },
     
-	// 解析数据格式的辅助方法
+	// 解析月度数据格式的辅助方法
 	parseDataArray(dataArray) {
-	if (!dataArray || !Array.isArray(dataArray) || dataArray.length === 0) {
-		return null
-	}
-	
-	// 按月份排序
-	const sortedData = [...dataArray].sort((a, b) => {
-		const monthA = parseInt(a.four_category.replace('月', ''))
-		const monthB = parseInt(b.four_category.replace('月', ''))
-		return monthA - monthB
-	})
-	
-	return {
-		predicted: sortedData.map(item => parseFloat(item.metric_name) || 0),
-		actual: sortedData.map(item => parseFloat(item.metric_value) || 0),
-		resource: sortedData.map(item => parseFloat(item.unit) || 0)
-	}
+		if (!dataArray || !Array.isArray(dataArray) || dataArray.length === 0) {
+			return null
+		}
+		
+		// 按月份排序
+		const sortedData = [...dataArray].sort((a, b) => {
+			const monthA = parseInt(a.four_category.replace('月', ''))
+			const monthB = parseInt(b.four_category.replace('月', ''))
+			return monthA - monthB
+		})
+		
+		return {
+			predicted: sortedData.map(item => parseFloat(item.metric_name) || 0),
+			actual: sortedData.map(item => parseFloat(item.metric_value) || 0),
+			resource: sortedData.map(item => parseFloat(item.unit) || 0)
+		}
+	},
+
+	// 解析年度数据格式的辅助方法
+	parseYearDataArray(dataArray) {
+		if (!dataArray || !Array.isArray(dataArray) || dataArray.length === 0) {
+			return null
+		}
+		
+		// 按年份排序
+		const sortedData = [...dataArray].sort((a, b) => {
+			const yearA = parseInt(a.four_category.replace('年', ''))
+			const yearB = parseInt(b.four_category.replace('年', ''))
+			return yearA - yearB
+		})
+		
+		return {
+			predicted: sortedData.map(item => parseFloat(item.metric_name) || 0),
+			actual: sortedData.map(item => parseFloat(item.metric_value) || 0),
+			resource: sortedData.map(item => {
+				// 从unit字段提取数值，如果unit是"万kWh"这样的格式，可能需要特殊处理
+				// 这里假设有其他字段包含资源数据，或者根据实际情况调整
+				return parseFloat(item.unit.replace('万kWh', '')) || Math.random() * 10
+			})
+		}
 	},
     
 	initializeData() {
-	// 解析传入的数据
-	const allData = this.parseDataArray(this.all)
-	const windData = this.parseDataArray(this.windPower)
-	const solarData = this.parseDataArray(this.photovoltaic)
-	
-	if (allData && windData && solarData) {
-		// 如果有全部数据，直接使用全部数据的资源情况
-		this.chartData.all.month = {
-		predicted: [...allData.predicted],
-		actual: [...allData.actual],
-		resource: [...allData.resource]  // 直接使用全部数据的资源情况，不计算平均值
+		// 解析传入的月度数据
+		const allData = this.parseDataArray(this.all)
+		const windData = this.parseDataArray(this.windPower)
+		const solarData = this.parseDataArray(this.photovoltaic)
+		
+		// 解析传入的年度数据
+		const allYearData = this.parseYearDataArray(this.all_year)
+		const windYearData = this.parseYearDataArray(this.windPower_year)
+		const solarYearData = this.parseYearDataArray(this.photovoltaic_year)
+
+		// 处理月度数据
+		if (allData && windData && solarData) {
+			// 如果有全部数据，直接使用全部数据的资源情况
+			this.chartData.all.month = {
+				predicted: [...allData.predicted],
+				actual: [...allData.actual],
+				resource: [...allData.resource]
+			}
+			
+			this.chartData.wind.month = {
+				predicted: [...windData.predicted],
+				actual: [...windData.actual],
+				resource: [...windData.resource]
+			}
+			
+			this.chartData.solar.month = {
+				predicted: [...solarData.predicted],
+				actual: [...solarData.actual],
+				resource: [...solarData.resource]
+			}
+			
+			console.log('使用原始数据 - 全部资源情况:', this.chartData.all.month.resource)
+			
+		} else if (windData && solarData) {
+			// 如果没有全部数据，但有风电和光伏数据，则计算全部数据
+			this.chartData.wind.month = {
+				predicted: [...windData.predicted],
+				actual: [...windData.actual],
+				resource: [...windData.resource]
+			}
+			
+			this.chartData.solar.month = {
+				predicted: [...solarData.predicted],
+				actual: [...solarData.actual],
+				resource: [...solarData.resource]
+			}
+			
+			// 计算全部数据的平均值
+			this.calculateAllDataFromWindAndSolar()
+			
+		} else if (allData) {
+			// 如果只有全部数据，直接使用
+			this.chartData.all.month = {
+				predicted: [...allData.predicted],
+				actual: [...allData.actual],
+				resource: [...allData.resource]
+			}
+			
+			// 为风电和光伏生成默认数据
+			this.chartData.wind.month.predicted = this.generateRandomData(12, 800, 1200)
+			this.chartData.wind.month.actual = this.generateActualData(this.chartData.wind.month.predicted)
+			this.chartData.wind.month.resource = this.generateRandomData(12, 5.0, 10.0, 1)
+			
+			this.chartData.solar.month.predicted = this.generateRandomData(12, 250, 450)
+			this.chartData.solar.month.actual = this.generateActualData(this.chartData.solar.month.predicted)
+			this.chartData.solar.month.resource = this.generateRandomData(12, 2.5, 7.0, 1)
+			
+			console.log('只有全部数据 - 资源情况:', this.chartData.all.month.resource)
+			
+		} else {
+			// 如果props数据不存在，使用默认随机数据
+			this.chartData.wind.month.predicted = this.generateRandomData(12, 800, 1200)
+			this.chartData.wind.month.actual = this.generateActualData(this.chartData.wind.month.predicted)
+			this.chartData.wind.month.resource = this.generateRandomData(12, 5.0, 10.0, 1)
+			
+			this.chartData.solar.month.predicted = this.generateRandomData(12, 250, 450)
+			this.chartData.solar.month.actual = this.generateActualData(this.chartData.solar.month.predicted)
+			this.chartData.solar.month.resource = this.generateRandomData(12, 2.5, 7.0, 1)
+			
+			// 计算全部数据
+			this.calculateAllData()
 		}
-		
-		this.chartData.wind.month = {
-		predicted: [...windData.predicted],
-		actual: [...windData.actual],
-		resource: [...windData.resource]
+
+		// 处理年度数据
+		if (allYearData && windYearData && solarYearData) {
+			// 如果有完整的年度数据，直接使用
+			this.chartData.all.year = {
+				predicted: [...allYearData.predicted],
+				actual: [...allYearData.actual],
+				resource: [...allYearData.resource]
+			}
+			
+			this.chartData.wind.year = {
+				predicted: [...windYearData.predicted],
+				actual: [...windYearData.actual],
+				resource: [...windYearData.resource]
+			}
+			
+			this.chartData.solar.year = {
+				predicted: [...solarYearData.predicted],
+				actual: [...solarYearData.actual],
+				resource: [...solarYearData.resource]
+			}
+			
+		} else if (windYearData && solarYearData) {
+			// 如果有风电和光伏年度数据，计算全部年度数据
+			this.chartData.wind.year = {
+				predicted: [...windYearData.predicted],
+				actual: [...windYearData.actual],
+				resource: [...windYearData.resource]
+			}
+			
+			this.chartData.solar.year = {
+				predicted: [...solarYearData.predicted],
+				actual: [...solarYearData.actual],
+				resource: [...solarYearData.resource]
+			}
+			
+			// 计算全部年度数据
+			this.calculateAllYearDataFromWindAndSolar()
+			
+		} else if (allYearData) {
+			// 如果只有全部年度数据，直接使用
+			this.chartData.all.year = {
+				predicted: [...allYearData.predicted],
+				actual: [...allYearData.actual],
+				resource: [...allYearData.resource]
+			}
+			
+			// 为风电和光伏生成默认年度数据
+			this.chartData.wind.year.predicted = this.generateRandomData(8, 10000, 15000)
+			this.chartData.wind.year.actual = this.generateActualData(this.chartData.wind.year.predicted)
+			this.chartData.wind.year.resource = this.generateRandomData(8, 6.0, 9.0, 1)
+			
+			this.chartData.solar.year.predicted = this.generateRandomData(8, 4000, 5500)
+			this.chartData.solar.year.actual = this.generateActualData(this.chartData.solar.year.predicted)
+			this.chartData.solar.year.resource = this.generateRandomData(8, 4.0, 6.0, 1)
+			
+		} else {
+			// 如果没有年度数据，使用默认随机数据
+			this.chartData.wind.year.predicted = this.generateRandomData(8, 10000, 15000)
+			this.chartData.wind.year.actual = this.generateActualData(this.chartData.wind.year.predicted)
+			this.chartData.wind.year.resource = this.generateRandomData(8, 6.0, 9.0, 1)
+			
+			this.chartData.solar.year.predicted = this.generateRandomData(8, 4000, 5500)
+			this.chartData.solar.year.actual = this.generateActualData(this.chartData.solar.year.predicted)
+			this.chartData.solar.year.resource = this.generateRandomData(8, 4.0, 6.0, 1)
+			
+			// 计算全部年度数据
+			this.calculateAllYearData()
 		}
-		
-		this.chartData.solar.month = {
-		predicted: [...solarData.predicted],
-		actual: [...solarData.actual],
-		resource: [...solarData.resource]
-		}
-		
-		console.log('使用原始数据 - 全部资源情况:', this.chartData.all.month.resource)
-		
-	} else if (windData && solarData) {
-		// 如果没有全部数据，但有风电和光伏数据，则计算全部数据
-		this.chartData.wind.month = {
-		predicted: [...windData.predicted],
-		actual: [...windData.actual],
-		resource: [...windData.resource]
-		}
-		
-		this.chartData.solar.month = {
-		predicted: [...solarData.predicted],
-		actual: [...solarData.actual],
-		resource: [...solarData.resource]
-		}
-		
-		// 计算全部数据的平均值
-		this.calculateAllDataFromWindAndSolar()
-		
-	} else if (allData) {
-		// 如果只有全部数据，直接使用
-		this.chartData.all.month = {
-		predicted: [...allData.predicted],
-		actual: [...allData.actual],
-		resource: [...allData.resource]
-		}
-		
-		// 为风电和光伏生成默认数据
-		this.chartData.wind.month.predicted = this.generateRandomData(12, 800, 1200)
-		this.chartData.wind.month.actual = this.generateActualData(this.chartData.wind.month.predicted)
-		this.chartData.wind.month.resource = this.generateRandomData(12, 5.0, 10.0, 1)
-		
-		this.chartData.solar.month.predicted = this.generateRandomData(12, 250, 450)
-		this.chartData.solar.month.actual = this.generateActualData(this.chartData.solar.month.predicted)
-		this.chartData.solar.month.resource = this.generateRandomData(12, 2.5, 7.0, 1)
-		
-		console.log('只有全部数据 - 资源情况:', this.chartData.all.month.resource)
-		
-	} else {
-		// 如果props数据不存在，使用默认随机数据
-		this.chartData.wind.month.predicted = this.generateRandomData(12, 800, 1200)
-		this.chartData.wind.month.actual = this.generateActualData(this.chartData.wind.month.predicted)
-		this.chartData.wind.month.resource = this.generateRandomData(12, 5.0, 10.0, 1)
-		
-		this.chartData.solar.month.predicted = this.generateRandomData(12, 250, 450)
-		this.chartData.solar.month.actual = this.generateActualData(this.chartData.solar.month.predicted)
-		this.chartData.solar.month.resource = this.generateRandomData(12, 2.5, 7.0, 1)
-		
-		// 计算全部数据
-		this.calculateAllData()
-	}
-	
-	// ... 年度数据处理保持不变
 	},
     
 	// 新增方法：从风电和光伏数据计算全部数据
 	calculateAllDataFromWindAndSolar() {
-	// 计算预测发电量总和
-	this.chartData.all.month.predicted = this.chartData.wind.month.predicted.map((val, index) => 
-		val + this.chartData.solar.month.predicted[index]
-	)
-	
-	// 计算实际发电量总和
-	this.chartData.all.month.actual = this.chartData.wind.month.actual.map((val, index) => 
-		val + this.chartData.solar.month.actual[index]
-	)
-	
-	// 计算资源情况平均值（风速和辐照度的平均值作为综合资源指标）
-	this.chartData.all.month.resource = this.chartData.wind.month.resource.map((val, index) => 
-		parseFloat(((val + this.chartData.solar.month.resource[index]) / 2).toFixed(1))
-	)
+		// 计算预测发电量总和
+		this.chartData.all.month.predicted = this.chartData.wind.month.predicted.map((val, index) => 
+			val + this.chartData.solar.month.predicted[index]
+		)
+		
+		// 计算实际发电量总和
+		this.chartData.all.month.actual = this.chartData.wind.month.actual.map((val, index) => 
+			val + this.chartData.solar.month.actual[index]
+		)
+		
+		// 计算资源情况平均值（风速和辐照度的平均值作为综合资源指标）
+		this.chartData.all.month.resource = this.chartData.wind.month.resource.map((val, index) => 
+			parseFloat(((val + this.chartData.solar.month.resource[index]) / 2).toFixed(1))
+		)
+	},
+
+	// 新增方法：从风电和光伏年度数据计算全部年度数据
+	calculateAllYearDataFromWindAndSolar() {
+		this.chartData.all.year.predicted = this.chartData.wind.year.predicted.map((val, index) => 
+			val + this.chartData.solar.year.predicted[index]
+		)
+		
+		this.chartData.all.year.actual = this.chartData.wind.year.actual.map((val, index) => 
+			val + this.chartData.solar.year.actual[index]
+		)
+		
+		this.chartData.all.year.resource = this.chartData.wind.year.resource.map((val, index) => 
+			parseFloat(((val + this.chartData.solar.year.resource[index]) / 2).toFixed(1))
+		)
 	},
 
 	// 修改原有的计算方法
 	calculateAllData() {
-	// 计算月度数据
-	this.chartData.all.month.predicted = this.chartData.wind.month.predicted.map((val, index) => 
-		val + this.chartData.solar.month.predicted[index]
-	)
-	this.chartData.all.month.actual = this.chartData.wind.month.actual.map((val, index) => 
-		val + this.chartData.solar.month.actual[index]
-	)
-	// 资源情况取平均值（风速和辐照度单位不同，取平均值作为综合指标）
-	this.chartData.all.month.resource = this.chartData.wind.month.resource.map((val, index) => 
-		parseFloat(((val + this.chartData.solar.month.resource[index]) / 2).toFixed(1))
-	)
+		// 计算月度数据
+		this.chartData.all.month.predicted = this.chartData.wind.month.predicted.map((val, index) => 
+			val + this.chartData.solar.month.predicted[index]
+		)
+		this.chartData.all.month.actual = this.chartData.wind.month.actual.map((val, index) => 
+			val + this.chartData.solar.month.actual[index]
+		)
+		// 资源情况取平均值（风速和辐照度单位不同，取平均值作为综合指标）
+		this.chartData.all.month.resource = this.chartData.wind.month.resource.map((val, index) => 
+			parseFloat(((val + this.chartData.solar.month.resource[index]) / 2).toFixed(1))
+		)
 	},
+
+	// 新增方法：计算全部年度数据
+	calculateAllYearData() {
+		this.chartData.all.year.predicted = this.chartData.wind.year.predicted.map((val, index) => 
+			val + this.chartData.solar.year.predicted[index]
+		)
+		this.chartData.all.year.actual = this.chartData.wind.year.actual.map((val, index) => 
+			val + this.chartData.solar.year.actual[index]
+		)
+		this.chartData.all.year.resource = this.chartData.wind.year.resource.map((val, index) => 
+			parseFloat(((val + this.chartData.solar.year.resource[index]) / 2).toFixed(1))
+		)
+	},
+
     // 重新生成随机数据的方法（可选）
     refreshData() {
       // 重新生成wind数据
       this.chartData.wind.month.predicted = this.generateRandomData(12, 800, 1200)
       this.chartData.wind.month.resource = this.generateRandomData(12, 5.0, 10.0, 1)
-      this.chartData.wind.year.predicted = this.generateRandomData(5, 10000, 15000)
-      this.chartData.wind.year.resource = this.generateRandomData(5, 6.0, 9.0, 1)
+      this.chartData.wind.year.predicted = this.generateRandomData(8, 10000, 15000)
+      this.chartData.wind.year.resource = this.generateRandomData(8, 6.0, 9.0, 1)
       
       // 重新生成solar数据
       this.chartData.solar.month.predicted = this.generateRandomData(12, 250, 450)
       this.chartData.solar.month.resource = this.generateRandomData(12, 2.5, 7.0, 1)
-      this.chartData.solar.year.predicted = this.generateRandomData(5, 4000, 5500)
-      this.chartData.solar.year.resource = this.generateRandomData(5, 4.0, 6.0, 1)
+      this.chartData.solar.year.predicted = this.generateRandomData(8, 4000, 5500)
+      this.chartData.solar.year.resource = this.generateRandomData(8, 4.0, 6.0, 1)
       
       // 重新初始化数据
       this.initializeData()
@@ -498,27 +686,27 @@ export default {
 			show: false
 			},
 			xAxis: {
-			type: 'category',
-			data: this.xAxisData,
-			axisLine: {
-				lineStyle: {
-				color: '#2d5a87',
-				width: 2,
-				type: 'dashed' // 将底线改为虚线
+				type: 'category',
+				data: this.xAxisData,  // 这里使用计算属性中的数据
+				axisLine: {
+					lineStyle: {
+					color: '#2d5a87',
+					width: 2,
+					type: 'dashed'
+					}
+				},
+				axisTick: {
+					show: true,
+					lineStyle: {
+					color: '#2d5a87',
+					type: 'dashed'
+					}
+				},
+				axisLabel: {
+					color: '#FFFFFFCC',
+					fontSize: 26,
+					margin: 20
 				}
-			},
-			axisTick: {
-				show: true,
-				lineStyle: {
-				color: '#2d5a87',
-				type: 'dashed' // 刻度线也改为虚线
-				}
-			},
-			axisLabel: {
-				color: '#FFFFFFCC',
-				fontSize: 26,
-				margin: 20 // 增加标签与轴线的距离，相当于向下偏移20px
-			}
 			},
 			yAxis: [
 			{
@@ -716,16 +904,19 @@ export default {
 .power-generation-chart {
   width: 100%;
   height: 100%;
-  background: rgba(0, 20, 40, 0.8);
-  border: 1px solid #1e3c5a;
   border-radius: 4px;
   padding: 0px;
   color: #7ec7ff;
-  
+  .power-generation{
+	background: url("../../assets/images/homepage/fadianlingziyuan.png") center center no-repeat;
+  }
+  .power-generationplan{
+	background: url("../../assets/images/homepage/fadianjihuazhixing.png") center center no-repeat;
+  }
   .chart-header {
     	width: 100%;
 		height: 100px;
-		background: url("../../assets/images/homepage/ResourcesSituationImg.png") center center no-repeat;
+		
 		display: flex;
 	.icon {
 		color: #F6F9FE;
@@ -740,7 +931,7 @@ export default {
     }
 	.tabs {
         display: flex;
-		margin-left: 627px;
+		margin-left: 1000px;
 		width:347px;
         gap: 59px;
         button {
@@ -848,8 +1039,6 @@ export default {
   .chart-container {
     width: 1374px;
     height: 376px;
-    background: rgba(0, 10, 20, 0.5);
-    border: 1px solid #1e3c5a;
     border-radius: 4px;
   }
 }

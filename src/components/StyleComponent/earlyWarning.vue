@@ -260,7 +260,7 @@ align-items: center;
 justify-content: center;
 font-size: 26px;
 font-weight: 400;
-padding-left: 40px;
+padding-left: 100px;
 color: #A3C5FF;
 }
 
@@ -290,7 +290,9 @@ color: #A3C5FF;
 align-items: center;
 justify-content: center;
 }
-
+.event-header > div:nth-child(2) {
+  padding-left: 65px;
+}
 /* 事件优先级颜色 - 基于 mid_category */
 .priority-1 .event-priority {
 color: #A3C5FF;

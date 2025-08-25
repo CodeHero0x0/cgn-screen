@@ -1,8 +1,7 @@
 <template>
 	<div class="power-generation-chart">
 	  <!-- 头部控制区域 -->
-	  <div class="chart-header">
-		<span class="icon">{{StackedBarChartData.name}}</span>
+    <div class="chart-header" :class="{ 'power-generation': StackedBarChartData.name === '场内受累','power-generationplan': StackedBarChartData.name === '场外受累' }">
 		<div class="tabs">
 			<button 
 			  :class="{ active: activeTab === 'all' }" 
@@ -520,16 +519,18 @@ export default {
 .power-generation-chart {
   width: 100%;
   height: 100%;
-  background: rgba(0, 20, 40, 0.8);
-  border: 1px solid #1e3c5a;
   border-radius: 4px;
   padding: 0px;
   color: #7ec7ff;
-  
+  .power-generation{
+	background: url("../../assets/images/homepage/changneishoulei.png") center center no-repeat;
+  }
+  .power-generationplan{
+	background: url("../../assets/images/homepage/changwaishoulei.png") center center no-repeat;
+  }
   .chart-header {
     width: 100%;
     height: 100px;
-    background: url("../../assets/images/homepage/ResourcesSituationImg.png") center center no-repeat;
     display: flex;
     .icon {
       color: #F6F9FE;
@@ -544,7 +545,7 @@ export default {
     }
     .tabs {
       display: flex;
-      margin-left: 627px;
+      margin-left: 1000px;
       width:347px;
       gap: 59px;
       button {
@@ -633,8 +634,6 @@ export default {
   .chart-container {
     width: 1374px;
     height: 376px;
-    background: rgba(0, 10, 20, 0.5);
-    border: 1px solid #1e3c5a;
     border-radius: 4px;
   }
 }

@@ -48,21 +48,37 @@ export default {
 	getAnnualCompletion: (params) => http.getAxios('/api/business/getAnnualCompletion', params),
 	//业务运营/各场站上网电量完成情况/月度完成情况
 	getPlannedPower: (params) => http.getAxios('/api/business/getPlannedPower', params),
-	//业务运营/发电量和资源/全部-月度
-	getWindMonthlyActual: (params) => http.getAxios('/api/business/getAllMonthlyForecastedActual', params),
-	//业务运营/发电量和资源/风电-月度
-	getWindMonthlyForecasted: (params) => http.getAxios('/api/business/getWindMonthlyForecasted', params),
+	
 	//业务运营/发电量和资源/光伏-月度
 	getWindMonthlyAverageSpeed: (params) => http.getAxios('/api/business/getWindMonthlyAverageSpeed', params),
+	//业务运营/发电量和资源/光伏-年度
+	getAnnualPhotovoltaic: (params) => http.getAxios('/api/business/getAnnualPhotovoltaic', params),
+	//业务运营/发电量和资源/风电-月度
+	getWindMonthlyForecasted: (params) => http.getAxios('/api/business/getWindMonthlyForecasted', params),
+	//业务运营/发电量和资源/风电-年度
+	getWindMonthlyActual: (params) => http.getAxios('/api/business/getWindMonthlyActual', params),
+	//业务运营/发电量和资源/全部-月度
+	getAllMonthlyForecastedActual: (params) => http.getAxios('/api/business/getAllMonthlyForecastedActual', params),
+	//业务运营/发电量和资源/全部-年度
+	getAllMonthlyActual: (params) => http.getAxios('/api/business/getAllMonthlyActual', params),
+	
+	
+	
 	//业务运营/发电计划执行/全部-月度
 	getAllMonthlyPlanned: (params) => http.getAxios('/api/business/getAllMonthlyPlanned', params),
 	//业务运营/发电计划执行/风电-月度
 	getWindMonthlyPlaned: (params) => http.getAxios('/api/business/getWindMonthlyPlaned', params),
 	//业务运营/发电计划执行/光伏-月度
 	getWindMonthlyActualPower: (params) => http.getAxios('/api/business/getWindMonthlyActualPower', params),
+
+	//业务运营/发电计划执行/全部-年度
+	getAllAnnualPlan: (params) => http.getAxios('/api/business/getAllAnnualPlan', params),
+	//业务运营/发电计划执行/风电-年度
+	getWindAnnualPlaned: (params) => http.getAxios('/api/business/getWindAnnualPlaned', params),
+	//业务运营/发电计划执行/光伏-年度
+	getAnnualPhotovoltaicPlaned: (params) => http.getAxios('/api/business/getAnnualPhotovoltaicPlaned', params),
+
 	getMonthlyCompletion: (params) => http.getAxios('/api/business/getMonthlyCompletion', params),
-	// getMonthlyCompletion: (params) => http.getAxios('/api/business/getMonthlyCompletion', params),
-	// getMonthlyCompletion: (params) => http.getAxios('/api/business/getMonthlyCompletion', params),
 	//业务运营/损失电量/年累计限电概览
 	getAffectedOnSite: (params) => http.getAxios('/api/business/getAffectedOnSite', params),
 	//业务运营/限电分析/年累计限电概览

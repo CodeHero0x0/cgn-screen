@@ -148,10 +148,10 @@
 					
 				</div>
 				<div class="conmiddle-div">
-					<button>公司总览</button>
-					<button>业务运营</button>
-					<button>资源禀赋</button>
-					<button>设备管控</button>
+					<button @click="conmiddle(1)">公司总览</button>
+					<button @click="conmiddle(2)">业务运营</button>
+					<button @click="conmiddle(3)">资源禀赋</button>
+					<button @click="conmiddle(4)">设备管控</button>
 				</div>
 			</div>
 			<div class="conRight">
@@ -596,6 +596,31 @@ export default {
 				return 'bg-10-20';
 			} else {
 				return 'bg-0-10';
+			}
+		},
+		conmiddle(val){
+			if(val == 1){
+				this.$router.push({
+					name: "homeIndex",
+					params: {}
+				})
+			}else if(val == 2){
+				this.$router.push({
+					name: "index",
+					params: {}
+				})
+			}
+			else if(val == 3){
+				this.$router.push({
+					name: "ResourceEndowment",
+					params: {}
+				})
+			}
+			else if(val == 4){
+				this.$router.push({
+					name: "equipmentManagement",
+					params: {}
+				})
 			}
 		}
 	},

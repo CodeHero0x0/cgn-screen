@@ -368,8 +368,9 @@ export default {
     align-items: center;
     width: 100%;
     padding: 10px 0;
-	margin-top:20px;
-	margin-bottom:20px;
+    margin-top:20px;
+    margin-bottom:20px;
+    padding-left: 40px;
 }
 
 .legend-left {
@@ -410,7 +411,7 @@ export default {
     font-size: 26px;
     font-weight: 400;
     transition: color 0.3s ease;
-    padding-left: 50px;
+    padding-left: 0px;
   }
   
   .chart-container {

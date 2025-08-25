@@ -128,7 +128,7 @@
 								<span>{{ value.metric_value }}<i> / {{ value.metric_value }}<i style="font-size: 26px;"> {{ value.unit }}</i></i></span>
 							</p>
 						</div>
-						<h2></h2>
+						<h2 class="znxj"></h2>
 						<div class="Intelligent-inspection">
 							<div class="Intelligent-inspection-left" v-if="smartInspectionData.length > 1">
 								<div class="xunjian">
@@ -176,10 +176,10 @@
 			</div>
 			<div class="conmiddle">
 				<div class="conmiddle-div">
-					<button>公司总览</button>
-					<button>业务运营</button>
-					<button>资源禀赋</button>
-					<button>设备管控</button>
+					<button @click="conmiddle(1)">公司总览</button>
+					<button @click="conmiddle(2)">业务运营</button>
+					<button @click="conmiddle(3)">资源禀赋</button>
+					<button @click="conmiddle(4)">设备管控</button>
 				</div>
 			</div>
 
@@ -241,7 +241,7 @@
 							<div class="weatherwarning-div">
 								<WeatherWarning></WeatherWarning>
 							</div>
-							<earlyWarning class="earlyWarning" :events="events" :columns="eventColumns" :priority-config="customPriorityConfig"></earlyWarning>
+							<earlyWarning class="earlyWarning" :events="getWeatherWarningData" :columns="eventColumns"></earlyWarning>
 						</div>
 					</div>
 					<div class="weather-staff-right">
@@ -355,59 +355,6 @@ export default {
 				{'name':'储能','year':'22108','month':'36008','daily':'61.40%',"YoY":'','MoM':''},
 				{'name':'源网荷储','year':'63639','month':'67690','daily':'94.02%',"YoY":'','MoM':''},
 			],
-			events: [
-				{
-				id: 1,
-				priority: 1,
-				content: '问题某一明天风速急剧增',
-				location: '问题某一明',
-				time: '2018-03-14 10:27:00',
-				operator: '张三'
-				},
-				{
-				id: 2,
-				priority: 3,
-				content: '问题某一明天风速急剧增',
-				location: '',
-				time: '2018-03-14 10:27:00'
-				},
-				{
-				id: 2,
-				priority: 2,
-				content: '问题某一明天风速急剧增',
-				location: '',
-				time: '2018-03-14 10:27:00'
-				},
-				{
-				id: 2,
-				priority: 1,
-				content: '问题某一明天风速急剧增',
-				location: '',
-				time: '2018-03-14 10:27:00'
-				},
-				{
-				id: 2,
-				priority: 3,
-				content: '问题某一明天风速急剧增',
-				location: '',
-				time: '2018-03-14 10:27:00'
-				},
-				{
-				id: 2,
-				priority: 3,
-				content: '问题某一明天风速急剧增',
-				location: '',
-				time: '2018-03-14 10:27:00'
-				},
-				{
-				id: 2,
-				priority: 3,
-				content: '问题某一明天风速急剧增',
-				location: '',
-				time: '2018-03-14 10:27:00'
-				},
-				// ... 更多数据
-			],
 			// 列配置
 			eventColumns: [
 				{ 
@@ -464,6 +411,8 @@ export default {
 			safetyoverviewData:[],
 			//智慧运维
 			wisdomOpsData:[],
+
+			getWeatherWarningData:[],
 		}
 	},
 	created() {
@@ -495,6 +444,8 @@ export default {
 		this.safetyoverview();
 		//智慧运维
 		this.wisdomOps();
+		//-------
+		this.getWeatherWarning();
 	},
 	beforeDestroy(){
 	},
@@ -711,7 +662,45 @@ export default {
 				console.log(error)
 			})
 		},
-		
+		conmiddle(val){
+			if(val == 1){
+				this.$router.push({
+					name: "homeIndex",
+					params: {}
+				})
+			}else if(val == 2){
+				this.$router.push({
+					name: "index",
+					params: {}
+				})
+			}
+			else if(val == 3){
+				this.$router.push({
+					name: "ResourceEndowment",
+					params: {}
+				})
+			}
+			else if(val == 4){
+				this.$router.push({
+					name: "equipmentManagement",
+					params: {}
+				})
+			}
+		},
+		getWeatherWarning() {
+			this.$http.sx.getWeatherWarning({
+			}).then(res => {
+				if (res.code === 0) {
+					res.data.rowData.map((i,index)=>{
+						this.getWeatherWarningData.push({id:index,priority:i.sub_category,content:i.four_category,time:i.metric_name,mid_category:i.mid_category})
+						
+					})
+				}
+				
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
 	},
 }
 </script>
@@ -1157,6 +1146,9 @@ export default {
 					height: 100px;
 					width: 100%;
 				}
+				.znxj{
+					background: url("../../../assets/images/CompanyOverview/zhinengxunjian.png") center center no-repeat;
+				}
 				.average{
 					width: 100%;
 					display: flex;                       /* 使用 Flex 布局 */
@@ -1299,11 +1291,11 @@ export default {
 		}
 	}
 	.conmiddle{
-		width: 2600px;
+		width: 2781px;
 		height: 1862px;
 		position: absolute;
 		top: 238px;
-		left:2878px;
+		left:3079px;
 		background-size: 100% 100%;
 		.conmiddle-right{
 			position:absolute;

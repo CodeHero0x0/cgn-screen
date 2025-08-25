@@ -2,7 +2,6 @@
 	<div class="power-generation-chart">
 	  <!-- 头部控制区域 -->
 	  <div class="chart-header">
-		<span class="icon">{{StackedBarChartData.name}}</span>
 		<div class="tabs">
 			<button 
 			  :class="{ active: activeTab === 'all' }" 
@@ -319,7 +318,6 @@ export default {
   width: 100%;
   height: 100%;
   background: rgba(0, 20, 40, 0.8);
-  border: 1px solid #1e3c5a;
   border-radius: 4px;
   padding: 0px;
   color: #7ec7ff;
@@ -327,7 +325,7 @@ export default {
   .chart-header {
     width: 100%;
     height: 100px;
-    background: url("../../assets/images/homepage/ResourcesSituationImg.png") center center no-repeat;
+    background: url("../../assets/images/homepage/xiandiansunshi.png") center center no-repeat;
     display: flex;
     .icon {
       color: #F6F9FE;
@@ -368,7 +366,6 @@ export default {
     width: 1374px;
     height: 376px;
     background: rgba(0, 10, 20, 0.5);
-    border: 1px solid #1e3c5a;
     border-radius: 4px;
   }
 }

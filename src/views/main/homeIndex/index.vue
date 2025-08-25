@@ -50,7 +50,7 @@
 								</div>
 							</div>
 						</div>
-						<div class="ElectricityStatistics">
+						<div class="ElectricityStatistics" v-if="getPlannedPowerData.length > 0">
 							<div class="ElectricityStatistics_div">
 								<div>
 									<p>年计划发电量:{{ getPlannedPowerData[0].four_category }}</p>
@@ -110,11 +110,27 @@
 				</div>
 				<div class="ResourcesSituation">
 					<div class="resources">
-						<Resources :echartsData="echartsData" :all="getWindMonthlyActualData" :windPower="getWindMonthlyForecastedData" :photovoltaic="getWindMonthlyAverageSpeedData"></Resources>
+						<Resources 
+							:echartsData="echartsData" 
+							:all="getAllMonthlyForecastedActualData" 
+							:windPower="getWindMonthlyForecastedData" 
+							:photovoltaic="getWindMonthlyAverageSpeedData"
+							:all_year="getAllMonthlyActualData" 
+							:windPower_year="getWindMonthlyActualData" 
+							:photovoltaic_year="getAnnualPhotovoltaicData">
+						</Resources>
 						<div class="bottom"></div>
 					</div>
 					<div class="situation">
-						<Resources :echartsData="echartsData1" :all="getAllMonthlyPlannedData" :windPower="getWindMonthlyPlanedData" :photovoltaic="getWindMonthlyActualPowerData"></Resources>
+						<Resources 
+							:echartsData="echartsData1" 
+							:all="getAllMonthlyPlannedData" 
+							:windPower="getWindMonthlyPlanedData" 
+							:photovoltaic="getWindMonthlyActualPowerData"
+							:all_year="getAllAnnualPlanData" 
+							:windPower_year="getWindAnnualPlanedData" 
+							:photovoltaic_year="getAnnualPhotovoltaicPlanedData">
+						</Resources>
 						<div class="bottom"></div>
 					</div>
 				</div>
@@ -133,10 +149,10 @@
 					
 				</div> -->
 				<div class="conmiddle-div">
-					<button>公司总览</button>
-					<button>业务运营</button>
-					<button>资源禀赋</button>
-					<button>设备管控</button>
+					<button @click="conmiddle(1)">公司总览</button>
+					<button @click="conmiddle(2)">业务运营</button>
+					<button @click="conmiddle(3)">资源禀赋</button>
+					<button @click="conmiddle(4)">设备管控</button>
 				</div>
 			</div>
 			<div class="conRight">
@@ -213,7 +229,7 @@ export default {
 			currentWeek: '星期三',
 			currentSource: 'wind',
 			timeInterval: 'monthly',
-			echartsData:{'name': '发电量和资源','all':'全部','wind':'风电','solar':'光伏','IconCurve':'资源情况','unitOfMeasurement':'(m/s)'},
+			echartsData:{'name': '发电量和资源','all':'全部','wind':'风电','solar':'光伏','IconCurve':'资源情况','unitOfMeasurement':'(m/s)','headerBgImage':''},
 			echartsData1:{'name': '计划发电情况','all':'全部','wind':'风电','solar':'光伏','IconCurve':'完成率','unitOfMeasurement':'%'},
 			StackedBarChartData:{'name': '场内受累','all':'月度','wind':'年累计','solar':'发电机组','IconCurve':'输变电(升压站、集电线路)','unitOfMeasurement':'性能损失'},
 			StackedBarChartData1:{'name': '场外受累','all':'月度','wind':'年累计','solar':'电网','IconCurve':'天气原因','unitOfMeasurement':'其他'},
@@ -225,13 +241,23 @@ export default {
 			getAnnualCompletionData:[],
 			getMonthlyCompletionData:[],
 			//业务运营/发电量和资源
-			getWindMonthlyActualData:[],
-			getWindMonthlyForecastedData:[],
+
 			getWindMonthlyAverageSpeedData:[],
+			getAnnualPhotovoltaicData:[],
+
+			getWindMonthlyForecastedData:[],
+			getWindMonthlyActualData:[],
+
+			getAllMonthlyForecastedActualData:[],
+			getAllMonthlyActualData:[],
 			//业务运营/发电计划执行
 			getAllMonthlyPlannedData:[],
 			getWindMonthlyPlanedData:[],
 			getWindMonthlyActualPowerData:[],
+
+			getAllAnnualPlanData:[],
+			getWindAnnualPlanedData:[],
+			getAnnualPhotovoltaicPlanedData:[],
 			//业务运营/损失电量
 			getAffectedOnSiteData:[],
 			//业务运营/限电分析
@@ -256,12 +282,17 @@ export default {
 		this.getPlannedPower();
 		this.getAnnualCompletion();
 		this.getMonthlyCompletion();
+
 		this.getWindMonthlyActual();
 		this.getWindMonthlyForecasted();
+		this.getWindMonthlyAverageSpeed();
+		this.getAnnualPhotovoltaic();
+		this.getAllMonthlyForecastedActual();
+		this.getAllMonthlyActual();
+
 		this.getAffectedOnSite();
 		this.getAnnualRationing();
 		this.getMonthlyRationing();
-		this.getWindMonthlyAverageSpeed();
 		this.getAllMonthlyPlanned();
 		this.getWindMonthlyPlaned();
 		this.getWindMonthlyActualPower();
@@ -273,6 +304,10 @@ export default {
 		this.getMonthlyPowerGrid();
 		this.getAnnualGeneratorSet();
 		this.getScheduledMonthlyGeneratorSet();
+		
+		this.getAllAnnualPlan();
+		this.getWindAnnualPlaned();
+		this.getAnnualPhotovoltaicPlaned();
 	},
   	mounted() {
 	
@@ -505,6 +540,91 @@ export default {
 				console.log(error)
 			})
 		},
+		getAnnualPhotovoltaic() {
+			this.$http.sx.getAnnualPhotovoltaic({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getAnnualPhotovoltaicData = res.data.rowData;
+				}
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getAllMonthlyForecastedActual() {
+			this.$http.sx.getAllMonthlyForecastedActual({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getAllMonthlyForecastedActualData = res.data.rowData;
+				}
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getAllMonthlyActual() {
+			this.$http.sx.getAllMonthlyActual({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getAllMonthlyActualData = res.data.rowData;
+				}
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getAllAnnualPlan() {
+			this.$http.sx.getAllAnnualPlan({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getAllAnnualPlanData = res.data.rowData;
+				}
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getWindAnnualPlaned() {
+			this.$http.sx.getWindAnnualPlaned({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getWindAnnualPlanedData = res.data.rowData;
+				}
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		getAnnualPhotovoltaicPlaned() {
+			this.$http.sx.getAnnualPhotovoltaicPlaned({
+			}).then(res => {
+				if (res.code === 0) {
+					this.getAnnualPhotovoltaicPlanedData = res.data.rowData;
+				}
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		conmiddle(val){
+			if(val == 1){
+				this.$router.push({
+					name: "homeIndex",
+					params: {}
+				})
+			}else if(val == 2){
+				this.$router.push({
+					name: "index",
+					params: {}
+				})
+			}
+			else if(val == 3){
+				this.$router.push({
+					name: "ResourceEndowment",
+					params: {}
+				})
+			}
+			else if(val == 4){
+				this.$router.push({
+					name: "equipmentManagement",
+					params: {}
+				})
+			}
+		}
 	},
 }
 </script>
@@ -674,7 +794,7 @@ export default {
 				display: flex;
 				gap: 30px;
 				justify-content: space-between;
-				margin-top:30px;
+				margin-top:20px;
 				.ElectricityStatistics_div{
 					width: 500px;
 					height: 86px;
