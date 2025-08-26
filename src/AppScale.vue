@@ -36,7 +36,7 @@ export default {
   },
   data() {
     return {
-      containerSize: {
+      containerSize: {  
       //  width: 2640,
         width: 8640,
         height: 2160

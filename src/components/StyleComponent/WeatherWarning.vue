@@ -154,7 +154,7 @@
   
   .weather-item p:nth-child(2) {
     font-size: 26px;
-    text-align: center;
+    text-align: left;
     color: #a6c7ff;
     margin: 0;
     margin-top: 10px;

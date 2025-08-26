@@ -150,7 +150,7 @@
 				</div> -->
 				<div class="conmiddle-div">
 					<button @click="conmiddle(1)">公司总览</button>
-					<button @click="conmiddle(2)">业务运营</button>
+					<button @click="conmiddle(2)" class="selected">业务运营</button>
 					<button @click="conmiddle(3)">资源禀赋</button>
 					<button @click="conmiddle(4)">设备管控</button>
 				</div>
@@ -948,6 +948,9 @@ export default {
 				cursor: pointer;
 			}
 			button:hover{
+				background: url("../../../assets/images/homepage/butBackboardhover.png") center center no-repeat;
+			}
+			.selected{
 				background: url("../../../assets/images/homepage/butBackboardhover.png") center center no-repeat;
 			}
 		}
