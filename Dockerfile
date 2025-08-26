@@ -1,4 +1,4 @@
-FROM node:22-slim AS builder
+FROM crpi-ml938qrpofufqc5w.cn-hangzhou.personal.cr.aliyuncs.com/zyan-r/node:22-slim AS builder
 
 WORKDIR /app
 
@@ -12,7 +12,7 @@ COPY . .
 RUN npm run build
 
 
-FROM nginx:stable-alpine
+FROM crpi-ml938qrpofufqc5w.cn-hangzhou.personal.cr.aliyuncs.com/zyan-r/nginx:stable-alpine
 
 
 COPY --from=builder /app/dist /usr/share/nginx/html
