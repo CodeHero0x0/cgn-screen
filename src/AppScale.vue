@@ -7,7 +7,7 @@
         :style="{
         width: `${containerSize.width}px`,
         height: `${containerSize.height}px`,
-        transform: `scale(${scale.value}) translate3d(${ scale.type === 'xcenter' ? '-50%,0,0' : '0,-50%,0' })`
+        
       }"
       >
         <keep-alive>
@@ -235,7 +235,7 @@ export default {
     top: 0;
   }
   &.ycenter{
-    top: 50%;
+   // top: 50%;
     left: 0;
   }
 }
