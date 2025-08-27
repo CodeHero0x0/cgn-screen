@@ -327,7 +327,15 @@ import HourlyRanking from "@COM/echarts/HourlyRanking.vue";
 import HourBenchmarking from "@COM/echarts/HourBenchmarking.vue";
 import UnmannedAirportStation from "@COM/StyleComponent/UnmannedAirportStation.vue";
 import PatrolPieCharts from "@COM/echarts/PatrolPieCharts.vue";
-
+import shengyazhan from '../../../assets/images/equipmentManagement/shengyazhan.png'
+import fengdianshebei from '../../../assets/images/equipmentManagement/fengdianshebei.png'
+import guangfushebei from '../../../assets/images/equipmentManagement/guangfushebei.png'
+import chunengshebei from '../../../assets/images/equipmentManagement/chunengshebei.png'
+import nengliangguanli from '../../../assets/images/equipmentManagement/nengliangguanli.png'
+import gonglvyuce from '../../../assets/images/equipmentManagement/gonglvyuce.png'
+import diannengjiliang from '../../../assets/images/equipmentManagement/diannengjiliang.png'
+import baoxinlubo from '../../../assets/images/equipmentManagement/baoxinlubo.png'
+import huozaibaojing from '../../../assets/images/equipmentManagement/huozaibaojing.png'
 export default {
   	name: "homeIndex",
   	components: {
@@ -488,31 +496,31 @@ export default {
 				if (res.code === 0) {
 					res.data.rowData.map((i)=>{
 						if(i.four_category == '升压站设备'){
-							this.getMonitoringData.push({ id: 1, name: i.four_category, normal:i.metric_name, quantity: i.metric_name ,fault:i.metric_value,Warning:i.unit,img:'../../../src/assets/images/equipmentManagement/shengyazhan.png'})
+							this.getMonitoringData.push({ id: 1, name: i.four_category, normal:i.metric_name, quantity: i.metric_name ,fault:i.metric_value,Warning:i.unit,img:shengyazhan})
 						}
 						if(i.four_category == '风电设备'){
-							this.getMonitoringData.push({ id: 2, name: i.four_category, normal:i.metric_name, quantity: i.metric_name ,fault:i.metric_value,Warning:i.unit,img:'../../../src/assets/images/equipmentManagement/fengdianshebei.png'})
+							this.getMonitoringData.push({ id: 2, name: i.four_category, normal:i.metric_name, quantity: i.metric_name ,fault:i.metric_value,Warning:i.unit,img:fengdianshebei})
 						}
 						if(i.four_category == '光伏设备'){
-							this.getMonitoringData.push({ id: 3, name: i.four_category, normal:i.metric_name, quantity: i.metric_name ,fault:i.metric_value,Warning:i.unit,img:'../../../src/assets/images/equipmentManagement/guangfushebei.png'})
+							this.getMonitoringData.push({ id: 3, name: i.four_category, normal:i.metric_name, quantity: i.metric_name ,fault:i.metric_value,Warning:i.unit,img:guangfushebei})
 						}
 						if(i.four_category == '储能设备'){
-							this.getMonitoringData.push({ id: 4, name: i.four_category, normal:i.metric_name, quantity: i.metric_name ,fault:i.metric_value,Warning:i.unit,img:'../../../src/assets/images/equipmentManagement/chunengshebei.png'})
+							this.getMonitoringData.push({ id: 4, name: i.four_category, normal:i.metric_name, quantity: i.metric_name ,fault:i.metric_value,Warning:i.unit,img:chunengshebei})
 						}
 						if(i.four_category == '能量管理'){
-							this.getMonitoringData.push({ id: 5, name: i.four_category, normal:i.metric_name, quantity: i.metric_name ,fault:i.metric_value,Warning:i.unit,img:'../../../src/assets/images/equipmentManagement/nengliangguanli.png'})
+							this.getMonitoringData.push({ id: 5, name: i.four_category, normal:i.metric_name, quantity: i.metric_name ,fault:i.metric_value,Warning:i.unit,img:nengliangguanli})
 						}
 						if(i.four_category == '功率预测'){
-							this.getMonitoringData.push({ id: 6, name: i.four_category, normal:i.metric_name, quantity: i.metric_name ,fault:i.metric_value,Warning:i.unit,img:'../../../src/assets/images/equipmentManagement/gonglvyuce.png'})
+							this.getMonitoringData.push({ id: 6, name: i.four_category, normal:i.metric_name, quantity: i.metric_name ,fault:i.metric_value,Warning:i.unit,img:gonglvyuce})
 						}
 						if(i.four_category == '电能计量'){
-							this.getMonitoringData.push({ id: 7, name: i.four_category, normal:i.metric_name, quantity: i.metric_name ,fault:i.metric_value,Warning:i.unit,img:'../../../src/assets/images/equipmentManagement/diannengjiliang.png'})
+							this.getMonitoringData.push({ id: 7, name: i.four_category, normal:i.metric_name, quantity: i.metric_name ,fault:i.metric_value,Warning:i.unit,img:diannengjiliang})
 						}
 						if(i.four_category == '保信录波'){
-							this.getMonitoringData.push({ id: 8, name: i.four_category, normal:i.metric_name, quantity: i.metric_name ,fault:i.metric_value,Warning:i.unit,img:'../../../src/assets/images/equipmentManagement/baoxinlubo.png'})
+							this.getMonitoringData.push({ id: 8, name: i.four_category, normal:i.metric_name, quantity: i.metric_name ,fault:i.metric_value,Warning:i.unit,img:baoxinlubo})
 						}
 						if(i.four_category == '火灾报警'){
-							this.getMonitoringData.push({ id: 9, name: i.four_category, normal:i.metric_name, quantity: i.metric_name ,fault:i.metric_value,Warning:i.unit,img:'../../../src/assets/images/equipmentManagement/huozaibaojing.png'})
+							this.getMonitoringData.push({ id: 9, name: i.four_category, normal:i.metric_name, quantity: i.metric_name ,fault:i.metric_value,Warning:i.unit,img:huozaibaojing})
 						}
 					})
 				}
