@@ -4,7 +4,9 @@ import { SM4Util } from '../utils/sm4encry'
 import { setToken, getToken, removeToken} from '../utils/auth'
 import { Message } from 'element-ui'
 // 在config.js文件中统一存放一些公共常量，方便之后维护
-const baseURL = 'http://192.168.1.111:18080/data-service'
+const baseURL = 'http://cgn-cloud-gateway:18080/data-service'
+
+const BACKEND_SERVICE_PREFIX = '/data-service'
 window.SM4Util = SM4Util
 // 添加请求拦截器，在发送请求之前做些什么(**具体查看axios文档**)
 axios.interceptors.request.use(function (config) {
@@ -105,10 +107,12 @@ const getHeaders = (type) => {
 
 // 封装axios
 function apiAxios (method = 'GET', url, params, type, encryptFlag) {
+
+  const finalUrl = BACKEND_SERVICE_PREFIX + url;
   let httpDefault = {
     method: method,
-    baseURL: baseURL,
-    url: url,
+    baseURL: '/api',
+    url: finalUrl,
     params: method === 'GET' ? params : {},
     data: method === 'POST' ? getPostData(params, type, encryptFlag) : {},
     timeout: 500000,
