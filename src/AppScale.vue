@@ -1,20 +1,20 @@
 <template>
   <div id="app">
     <div class="container-main">
-      <div
-        class="container-wrapper"
-        :class="[scale.type]"
-        :style="{
-        width: `${containerSize.width}px`,
-        height: `${containerSize.height}px`,
-        transform: `scale(${scale.value}) translate3d(${ scale.type === 'xcenter' ? '-50%,0,0' : '0,-50%,0' })`
-      }"
-      >
-        <keep-alive>
-          <router-view v-if="$route.meta.keepAlive"></router-view>
-        </keep-alive>
-        <router-view v-if="!$route.meta.keepAlive"></router-view>
-      </div>
+		<div
+			class="container-wrapper"
+			:class="[scale.type]"
+			:style="{
+			width: `${containerSize.width}px`,
+			height: `${containerSize.height}px`,
+			transform: `scale(${scale.value}) translate3d(${ scale.type === 'xcenter' ? '-50%,0,0' : '0,-50%,0' })`
+		}"
+		>
+			<keep-alive>
+			<router-view v-if="$route.meta.keepAlive"></router-view>
+			</keep-alive>
+			<router-view v-if="!$route.meta.keepAlive"></router-view>
+		</div>
     </div>
   </div>
 </template>
@@ -82,8 +82,7 @@ export default {
         let e1 = e || event || window.event || arguments.callee.caller.arguments[0]
         //键盘按键判断:左箭头-37;上箭头-38；右箭头-39;下箭头-40
         // 0-48;  1-49;   2-50;     3-51;   4-52;      5-53;     6-54;      7-55;      8-56;        9-57;
-                 //集团   //公司    //发展   //战略规划  //业务   // 产业链  //社会  // 党建      //企业文化
-                 console.log(1111111,e1.keyCode)
+        //集团   //公司    //发展   //战略规划  //业务   // 产业链  //社会  // 党建      //企业文化
         if (e1 && e1.keyCode === 49) {
           this.$router.push({
             name: "homeIndex",

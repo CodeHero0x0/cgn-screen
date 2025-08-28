@@ -5,7 +5,7 @@ import { setToken, getToken, removeToken} from '../utils/auth'
 import { Message } from 'element-ui'
 // 在config.js文件中统一存放一些公共常量，方便之后维护
 const baseURL = 'http://cgn-cloud-gateway:18080/data-service'
-
+//const baseURL = 'http://192.168.1.111:18080/data-service'
 const BACKEND_SERVICE_PREFIX = '/data-service'
 window.SM4Util = SM4Util
 // 添加请求拦截器，在发送请求之前做些什么(**具体查看axios文档**)
