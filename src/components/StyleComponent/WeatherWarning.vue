@@ -47,18 +47,21 @@
 		scrollTimer: null,
 		scrollSpeed: 1,
 		stations: [
-		//   {
-		// 	name: '青河光伏电站',
-		// 	temperature: '14/27°',
-		// 	weather: '晴间多云',
-		// 	description: '场站运行状态良好，最大风速11.8m/s，最小风速8.3m/s，平均风速9.6m/s。'
-		//   },
 		]
 	  }
 	},
+	watch: {
+	// 监听父组件数据变化，更新图表
+		stationWeatherWarningData: {
+			handler() {
+				this.stations = this.stationWeatherWarningData;
+			},
+			deep: true
+		}
+	},
 	mounted() {
 		this.stations = this.stationWeatherWarningData;
-	  this.startAutoScroll();
+	  	this.startAutoScroll();
 	},
 	beforeUnmount() {
 	  this.stopAutoScroll();
