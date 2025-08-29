@@ -31,6 +31,8 @@ export default {
 	statistics: (params) => http.getAxios('/api/companyOverview/generateElectricity/statistics', params),
 	//公司总览/发电量/获取发电量统计
 	getByType: (params) => http.getAxios('/api/companyOverview/generateElectricity/yearStatistics', params),
+	//公司总览/发电量/天气预警
+	stationWeatherWarning: (params) => http.getAxios('/api/companyOverview/stationWeatherWarning', params),
 	//公司总览/人员车辆/车辆信息
 	car: (params) => http.getAxios('/api/companyOverview/personAndCar/car', params),
 	//公司总览/人员车辆/人员信息

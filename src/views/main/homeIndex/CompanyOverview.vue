@@ -239,7 +239,7 @@
 						<h2></h2>
 						<div class="weatherwarning">
 							<div class="weatherwarning-div">
-								<WeatherWarning></WeatherWarning>
+								<WeatherWarning  :stationWeatherWarningData="stationWeatherWarningData"></WeatherWarning>
 							</div>
 							<earlyWarning class="earlyWarning" :events="getWeatherWarningData" :columns="eventColumns"></earlyWarning>
 						</div>
@@ -404,6 +404,8 @@ export default {
 			//发电量
 			statisticsData:[],
 			getByTypeData:[],
+			//天气预警
+			stationWeatherWarningData:[],
 			//人员车辆
 			carData:[],
 			personData:[],
@@ -446,6 +448,7 @@ export default {
 		this.wisdomOps();
 		//-------
 		this.getWeatherWarning();
+		this.stationWeatherWarning();
 	},
 	beforeDestroy(){
 	},
@@ -657,6 +660,16 @@ export default {
 			}).then(res => {
 				if (res.code === 0) {
 					this.wisdomOpsData = res.data.rowData;
+				}
+			}).catch((error)=>{
+				console.log(error)
+			})
+		},
+		stationWeatherWarning() {
+			this.$http.sx.stationWeatherWarning({
+			}).then(res => {
+				if (res.code === 0) {
+					this.stationWeatherWarningData = res.data.rowData;
 				}
 			}).catch((error)=>{
 				console.log(error)
